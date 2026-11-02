@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#3179df">
+  <title>Services | NumbaHub Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../assets/css/admin.css">
+  <style>
+    /* Custom Toggle Switch Styling */
+    .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--brand); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* Premium Modal Styles */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 16px; opacity: 0; visibility: hidden; transition: all 0.2s ease; }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .premium-modal { background: #fff; width: 100%; max-width: 450px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: translateY(20px); transition: transform 0.2s ease; overflow: hidden; }
+    .modal-overlay.active .premium-modal { transform: translateY(0); }
+    .modal-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
+    .modal-body { padding: 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px; background: #f8fafc; }
+    .input-group { margin-bottom: 16px; }
+    .input-group label { display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px; }
+    .input-group input, .input-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; transition: border 0.2s; }
+    .input-group input:focus, .input-group textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(67,137,238,0.1); }
+  </style>
+</head>
+<body data-page="services">
+  <div class="app-shell">
+    <div id="sidebar-host"></div>
+    <div class="mobile-overlay" data-close-sidebar></div>
+    
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" type="button" data-open-sidebar aria-label="Open navigation"><i data-lucide="menu"></i></button>
+          <span class="topbar-title">Services</span>
+        </div>
+        <div class="topbar-actions">
+          <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
+          <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
+          <button class="profile-button" type="button" onclick="logoutAdmin()"><span class="avatar">AD</span><span class="profile-copy"><strong>Admin Console</strong><small>Click to logout</small></span><i data-lucide="log-out" style="width:14px;height:14px;color:#8b95a7"></i></button>
+        </div>
+      </header>
+      
+      <main class="page-content">
+        <div class="page-heading">
+          <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>Services</h1><p>Configure the services available on NumbaHub.</p></div>
+          <div class="heading-actions">
+            <button class="button" type="button" onclick="loadServices()"><i data-lucide="refresh-cw"></i> Refresh</button>
+          </div>
+        </div>
+
+        <div class="alert-box" style="margin-bottom: 24px; display: flex; gap: 12px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <i data-lucide="info" style="color: #64748b;"></i>
+          <div>
+            <strong style="display: block; font-size: 14px; color: #1e293b;">Service Control</strong>
+            <span style="font-size: 13px; color: #64748b;">Toggling a service off will immediately hide it from the user dashboard.</span>
+          </div>
+        </div>
+
+        <div class="service-grid" id="servicesGrid">
+          <div class="skeleton" style="height: 200px; border-radius: 12px;"></div>
+          <div class="skeleton" style="height: 200px; border-radius: 12px;"></div>
+          <div class="skeleton" style="height: 200px; border-radius: 12px;"></div>
+          <div class="skeleton" style="height: 200px; border-radius: 12px;"></div>
+        </div>
+
+        <section class="panel" style="margin-top: 24px;">
+          <div class="panel-header"><div><h2 class="panel-title">Service management checklist</h2><p class="panel-subtitle">Use these fields for each service integration.</p></div></div>
+          <div class="metric-row">
+            <div class="metric-box"><span>Provider mapping</span><strong>Required</strong></div>
+            <div class="metric-box"><span>Price and margin</span><strong>Required</strong></div>
+            <div class="metric-box"><span>Failure handling</span><strong>Required</strong></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- 🟢 CONFIGURE SERVICE MODAL -->
+  <div class="modal-overlay" id="configModal">
+    <div class="premium-modal">
+      <div class="modal-header">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 700;" id="modalTitle">Configure Service</h2>
+        <button class="icon-button" onclick="closeModal('configModal')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="configId">
+        
+        <div class="input-group">
+          <label>Display Name</label>
+          <input type="text" id="configDisplayName" placeholder="e.g. Receive SMS">
+        </div>
+        
+        <div class="input-group">
+          <label>Provider</label>
+          <input type="text" id="configProvider" placeholder="e.g. 5sim, Reloadly, Billpoint">
+        </div>
+        
+        <div class="input-group">
+          <label>Description</label>
+          <textarea id="configDescription" rows="3" placeholder="Brief description of the service..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="button" onclick="closeModal('configModal')">Cancel</button>
+        <button class="button button-primary" id="saveConfigBtn" onclick="saveServiceConfig()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000/api" 
+      : "https://numbahub-backend.onrender.com/api";
+
+    async function adminFetch(endpoint, options = {}) {
+      const token = localStorage.getItem("adminToken");
+      if (!token) { window.location.href = "login.html"; return; }
+      const res = await fetch(`${API_URL}${endpoint}`, { 
+        ...options,
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", ...options.headers } 
+      });
+      if (res.status === 401 || res.status === 403) { localStorage.removeItem("adminToken"); window.location.href = "login.html"; return; }
+      return await res.json();
+    }
+
+    async function loadSidebar() {
+      const host = document.getElementById("sidebar-host");
+      if (!host) return;
+      const isSubPage = window.location.pathname.includes('/pages/');
+      const rootPath = isSubPage ? '../' : './';
+      try {
+        const res = await fetch(`${rootPath}components/sidebar.html`);
+        let html = await res.text();
+        html = html.replace(/__ROOT__/g, rootPath);
+        host.innerHTML = html;
+        
+        const currentPage = document.body.dataset.page || 'dashboard';
+        const activeLink = host.querySelector(`a[data-nav="${currentPage}"]`);
+        if (activeLink) { activeLink.style.background = 'var(--brand)'; activeLink.style.color = '#fff'; }
+        if (window.lucide) lucide.createIcons();
+        
+        const sidebarLogoutBtn = host.querySelector('[data-action="logout"]');
+        if (sidebarLogoutBtn) sidebarLogoutBtn.addEventListener('click', logoutAdmin);
+        
+        const menuBtn = document.querySelector('[data-open-sidebar]');
+        const overlay = document.querySelector('[data-close-sidebar]');
+        const sidebar = document.getElementById('admin-sidebar');
+        if (menuBtn && overlay && sidebar) {
+          menuBtn.addEventListener('click', () => { sidebar.classList.add('open'); overlay.classList.add('active'); });
+          overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); });
+        }
+      } catch (err) { console.error("Sidebar error:", err); }
+    }
+
+    function logoutAdmin() {
+      localStorage.removeItem("adminToken");
+      window.location.href = "login.html";
+    }
+
+    async function loadServices() {
+      const grid = document.getElementById("servicesGrid");
+      grid.innerHTML = `
+        <div class="skeleton" style="height: 200px; border-radius: 12px;"></div>
+        <div class="skeleton" style="height: 200px; border-radius: 12px;"></div>
+        <div class="skeleton" style="height: 200px; border-radius: 12px;"></div>
+        <div class="skeleton" style="height: 200px; border-radius: 12px;"></div>
+      `;
+
+      try {
+        const services = await adminFetch("/admin/services");
+        
+        grid.innerHTML = services.map(s => `
+          <article class="service-card" style="padding: 20px; border-radius: 12px; background: #fff; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="service-card-top" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                <span class="service-symbol" style="width: 40px; height: 40px; background: #eff6ff; color: var(--brand); border-radius: 8px; display: grid; place-items: center;">
+                  <i data-lucide="${s.icon || 'box'}" style="width: 20px; height: 20px;"></i>
+                </span>
+                
+                <label class="toggle-switch">
+                  <input type="checkbox" ${s.isEnabled ? 'checked' : ''} onchange="toggleService('${s._id}', this.checked)">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 700;">${s.displayName}</h3>
+              <p style="margin: 0 0 16px; font-size: 13px; color: #64748b; line-height: 1.5;">${s.description}</p>
+            </div>
+            
+            <div>
+              <div class="service-meta" style="display: flex; justify-content: space-between; font-size: 12px; border-top: 1px solid #f1f5f9; padding-top: 12px; margin-bottom: 12px;">
+                <span style="color: #64748b;">Provider</span>
+                <strong style="color: #1e293b;">${s.provider}</strong>
+              </div>
+              <!-- 🟢 OPEN CONFIG MODAL -->
+              <button class="button button-small" style="width: 100%;" onclick="openConfigModal('${s._id}', '${s.displayName}', '${s.provider}', '${s.description}')">Configure Service</button>
+            </div>
+          </article>
+        `).join('');
+
+        if (window.lucide) lucide.createIcons();
+
+      } catch (err) {
+        console.error("Services error:", err);
+        grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: red;">Failed to load services.</p>`;
+      }
+    }
+
+    async function toggleService(id, isEnabled) {
+      try {
+        await adminFetch(`/admin/services/${id}`, {
+          method: "PUT",
+          body: JSON.stringify({ isEnabled })
+        });
+        console.log(`Service ${id} toggled to ${isEnabled}`);
+      } catch (err) {
+        alert("Failed to update service status");
+        loadServices(); // Revert on failure
+      }
+    }
+
+    // 🟢 MODAL LOGIC
+    window.openConfigModal = (id, displayName, provider, description) => {
+      document.getElementById("configId").value = id;
+      document.getElementById("configDisplayName").value = displayName;
+      document.getElementById("configProvider").value = provider === "Not configured" ? "" : provider;
+      document.getElementById("configDescription").value = description;
+      
+      document.getElementById("modalTitle").textContent = `Configure ${displayName}`;
+      document.getElementById("configModal").classList.add("active");
+    };
+
+    window.closeModal = (modalId) => {
+      document.getElementById(modalId).classList.remove("active");
+    };
+
+    window.saveServiceConfig = async () => {
+      const id = document.getElementById("configId").value;
+      const displayName = document.getElementById("configDisplayName").value.trim();
+      const provider = document.getElementById("configProvider").value.trim() || "Not configured";
+      const description = document.getElementById("configDescription").value.trim();
+
+      if (!displayName || !description) {
+        return alert("Please fill in the display name and description.");
+      }
+
+      const btn = document.getElementById("saveConfigBtn");
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Saving...";
+
+      try {
+        await adminFetch(`/admin/services/${id}`, {
+          method: "PUT",
+          body: JSON.stringify({ displayName, provider, description })
+        });
+        
+        closeModal("configModal");
+        loadServices(); // Refresh the grid to show new data
+      } catch (err) {
+        alert(err.message || "Failed to update service configuration");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    };
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (window.lucide) lucide.createIcons();
+      await loadSidebar();
+      loadServices();
+    });
+  </script>
+</body>
+</html>

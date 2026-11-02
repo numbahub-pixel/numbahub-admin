@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#3179df">
+  <title>System Settings | NumbaHub Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body data-page="settings">
+  <div class="app-shell">
+    <div id="sidebar-host"></div>
+    <div class="mobile-overlay" data-close-sidebar></div>
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" type="button" data-open-sidebar aria-label="Open navigation"><i data-lucide="menu"></i></button>
+          <span class="topbar-title">System Settings</span>
+        </div>
+        <div class="topbar-actions">
+          <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
+          <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
+          <button class="profile-button" type="button" data-action="profile-menu"><span class="avatar">EA</span><span class="profile-copy"><strong>Elleks Admin</strong><small>Super Admin · Demo</small></span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#8b95a7"></i></button>
+        </div>
+      </header>
+      <main class="page-content">
+        <div class="page-heading">
+          <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>System Settings</h1><p>Manage platform preferences and system configuration.</p></div>
+          <div class="heading-actions"><button class="button" type="button" data-action="refresh-page"><i data-lucide="refresh-cw"></i> Refresh</button><button class="button" type="button" data-action="help"><i data-lucide="circle-help"></i> Help</button></div>
+        </div>
+        <div class="demo-banner"><span class="status pending">Demo mode</span> <span style="font-size:11px;color:#8b6a35;margin-left:7px">Sample content only · no live backend actions are performed.</span></div>
+        <div class="alert-box"><i data-lucide="info"></i><div><strong>Settings preview</strong>Saving forms in this frontend displays a demo confirmation only. Production settings must be validated and persisted by the backend.</div></div><div class="content-grid"><section class="panel"><div class="panel-header"><div><h2 class="panel-title">General settings</h2><p class="panel-subtitle">Basic platform preferences.</p></div></div><form data-demo-form="general-settings"><div class="field"><label class="field-label" for="platform-name">Platform name</label><input class="input-control" id="platform-name" value="NumbaHub" required></div><div class="field"><label class="field-label" for="support-email">Support email</label><input class="input-control" id="support-email" type="email" placeholder="support@example.com"></div><div class="field"><label class="field-label" for="default-currency">Default currency</label><select class="select-control" id="default-currency"><option value="NGN">NGN — Nigerian Naira</option><option value="USD">USD — US Dollar</option></select></div><div class="field"><label class="field-label" for="timezone">Timezone</label><select class="select-control" id="timezone"><option>Africa/Lagos (WAT)</option><option>UTC</option></select></div><div class="form-actions"><button class="button button-primary" type="submit">Save demo settings</button></div></form></section>
+<section class="panel"><div class="panel-header"><div><h2 class="panel-title">Platform availability</h2><p class="panel-subtitle">Controls require server-side implementation.</p></div></div><div class="activity-list"><div class="activity-item"><span class="activity-icon"><i data-lucide="wrench"></i></span><div class="activity-copy"><strong>Maintenance mode</strong><p>Show a maintenance page to customers.</p></div><input class="toggle" type="checkbox" data-demo-toggle="Maintenance mode" aria-label="Maintenance mode"></div><div class="activity-item"><span class="activity-icon"><i data-lucide="mail"></i></span><div class="activity-copy"><strong>Email notifications</strong><p>Requires a configured email provider.</p></div><input class="toggle" type="checkbox" data-demo-toggle="Email notifications" aria-label="Email notifications" checked></div><div class="activity-item"><span class="activity-icon"><i data-lucide="bell"></i></span><div class="activity-copy"><strong>Push notifications</strong><p>Requires configured push delivery.</p></div><input class="toggle" type="checkbox" data-demo-toggle="Push notifications" aria-label="Push notifications"></div></div></section></div>
+<div class="content-grid"><section class="panel"><div class="panel-header"><div><h2 class="panel-title">Session and access policy</h2><p class="panel-subtitle">Recommended settings to configure on the server.</p></div></div><div class="field"><label class="field-label" for="session-timeout">Session idle timeout</label><select class="select-control" id="session-timeout"><option>15 minutes</option><option selected>30 minutes</option><option>60 minutes</option></select></div><div class="field"><label class="field-label" for="mfa-policy">Multi-factor authentication</label><select class="select-control" id="mfa-policy"><option>Required for all admins</option><option>Required for privileged roles</option><option>Optional (not recommended)</option></select></div><button class="button" data-action="save-policy">Save demo policy</button></section><section class="panel"><div class="panel-header"><div><h2 class="panel-title">System health</h2><p class="panel-subtitle">Live health checks will be wired to backend monitoring.</p></div><span class="status pending">Not connected</span></div><div class="activity-list"><div class="activity-item"><span class="activity-icon"><i data-lucide="database"></i></span><div class="activity-copy"><strong>Database</strong><p>Connection status unavailable in frontend preview.</p></div></div><div class="activity-item"><span class="activity-icon"><i data-lucide="server"></i></span><div class="activity-copy"><strong>Backend API</strong><p>No API base URL configured.</p></div></div><div class="activity-item"><span class="activity-icon"><i data-lucide="workflow"></i></span><div class="activity-copy"><strong>Background jobs</strong><p>Worker status unavailable.</p></div></div></div></section></div>
+      </main>
+    </div>
+  </div>
+  <div class="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <div class="modal-backdrop" id="admin-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal"><div class="modal-header"><h2 id="modal-title">Details</h2><button class="icon-button" type="button" data-close-modal aria-label="Close dialog"><i data-lucide="x"></i></button></div><div class="modal-body" id="modal-body"></div><div class="modal-footer"><button class="button" type="button" data-close-modal>Close</button><button class="button button-primary" type="button" data-action="modal-confirm">Confirm demo action</button></div></div>
+  </div>
+  <script src="../assets/js/admin.js"></script>
+</body>
+</html>

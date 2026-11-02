@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#3179df">
+  <title>Customer Support | NumbaHub Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body data-page="support">
+  <div class="app-shell">
+    <div id="sidebar-host"></div>
+    <div class="mobile-overlay" data-close-sidebar></div>
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" type="button" data-open-sidebar aria-label="Open navigation"><i data-lucide="menu"></i></button>
+          <span class="topbar-title">Customer Support</span>
+        </div>
+        <div class="topbar-actions">
+          <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
+          <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
+          <button class="profile-button" type="button" data-action="profile-menu"><span class="avatar">EA</span><span class="profile-copy"><strong>Elleks Admin</strong><small>Super Admin · Demo</small></span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#8b95a7"></i></button>
+        </div>
+      </header>
+      <main class="page-content">
+        <div class="page-heading">
+          <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>Customer Support</h1><p>Review tickets and coordinate customer resolutions.</p></div>
+          <div class="heading-actions"><button class="button" type="button" data-action="refresh-page"><i data-lucide="refresh-cw"></i> Refresh</button><button class="button" type="button" data-action="help"><i data-lucide="circle-help"></i> Help</button></div>
+        </div>
+        <div class="demo-banner"><span class="status pending">Demo mode</span> <span style="font-size:11px;color:#8b6a35;margin-left:7px">Sample content only · no live backend actions are performed.</span></div>
+        <div class="stats-grid"><article class="stat-card"><div class="stat-top"><span class="stat-label">Open tickets</span><span class="stat-icon"><i data-lucide="inbox"></i></span></div><div class="stat-value">24</div><div class="stat-foot">Sample count</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Urgent</span><span class="stat-icon"><i data-lucide="alert-triangle"></i></span></div><div class="stat-value">3</div><div class="stat-foot"><span class="trend-down">Review promptly</span></div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Awaiting customer</span><span class="stat-icon"><i data-lucide="message-circle"></i></span></div><div class="stat-value">8</div><div class="stat-foot">Sample count</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Resolved today</span><span class="stat-icon"><i data-lucide="check-check"></i></span></div><div class="stat-value">41</div><div class="stat-foot">Sample count</div></article></div>
+<div class="table-panel"><div class="table-toolbar"><div><h2>Support tickets</h2><p class="panel-subtitle">Demo tickets for interface preview.</p></div><div class="toolbar-controls"><div class="table-search"><i data-lucide="search"></i><input class="input-control" placeholder="Search tickets..." data-table-search="support-table"></div><select class="select-control" style="width:140px" data-table-filter="support-table"><option value="">All priorities</option><option>Urgent</option><option>High</option><option>Normal</option></select><button class="button button-primary" data-action="create-ticket"><i data-lucide="plus"></i> New ticket</button></div></div><div class="table-wrap"><table id="support-table"><thead><tr><th>Ticket</th><th>Customer</th><th>Subject</th><th>Priority</th><th>Assigned to</th><th>Status</th><th>Updated</th><th>Action</th></tr></thead><tbody>
+<tr data-searchable><td class="cell-primary">DEMO-TKT-218</td><td>Amaka Okafor</td><td>Deposit not reflected</td><td><span class="status failed">Urgent</span></td><td>Tunde Ops</td><td><span class="status pending">Open</span></td><td>8 min ago</td><td><button class="button button-small" data-action="view-record" data-record="DEMO-TKT-218">Open</button></td></tr>
+<tr data-searchable><td class="cell-primary">DEMO-TKT-217</td><td>Daniel Yusuf</td><td>SMS not received</td><td><span class="status pending">High</span></td><td>Support Team</td><td><span class="status pending">Open</span></td><td>24 min ago</td><td><button class="button button-small" data-action="view-record" data-record="DEMO-TKT-217">Open</button></td></tr>
+<tr data-searchable><td class="cell-primary">DEMO-TKT-216</td><td>Mary James</td><td>Refund status request</td><td><span class="status neutral">Normal</span></td><td>Feyi K.</td><td><span class="status info">Pending</span></td><td>1 hour ago</td><td><button class="button button-small" data-action="view-record" data-record="DEMO-TKT-216">Open</button></td></tr>
+<tr data-searchable><td class="cell-primary">DEMO-TKT-215</td><td>Ibrahim Bello</td><td>Account access</td><td><span class="status neutral">Normal</span></td><td>Support Team</td><td><span class="status">Resolved</span></td><td>Yesterday</td><td><button class="button button-small" data-action="view-record" data-record="DEMO-TKT-215">Open</button></td></tr>
+</tbody></table></div></div>
+      </main>
+    </div>
+  </div>
+  <div class="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <div class="modal-backdrop" id="admin-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal"><div class="modal-header"><h2 id="modal-title">Details</h2><button class="icon-button" type="button" data-close-modal aria-label="Close dialog"><i data-lucide="x"></i></button></div><div class="modal-body" id="modal-body"></div><div class="modal-footer"><button class="button" type="button" data-close-modal>Close</button><button class="button button-primary" type="button" data-action="modal-confirm">Confirm demo action</button></div></div>
+  </div>
+  <script src="../assets/js/admin.js"></script>
+</body>
+</html>

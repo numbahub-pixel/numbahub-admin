@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#3179df">
+  <title>Audit & Security | NumbaHub Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../assets/css/admin.css">
+  <style>
+    /* Premium Modal Styles */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 16px; opacity: 0; visibility: hidden; transition: all 0.2s ease; }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .premium-modal { background: #fff; width: 100%; max-width: 500px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: translateY(20px); transition: transform 0.2s ease; overflow: hidden; }
+    .modal-overlay.active .premium-modal { transform: translateY(0); }
+    .modal-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
+    .modal-body { padding: 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px; background: #f8fafc; }
+    
+    .detail-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { font-size: 13px; color: #64748b; font-weight: 500; }
+    .detail-value { font-size: 14px; color: #1e293b; font-weight: 600; text-align: right; word-break: break-all; max-width: 60%; }
+  </style>
+</head>
+<body data-page="audit">
+  <div class="app-shell">
+    <div id="sidebar-host"></div>
+    <div class="mobile-overlay" data-close-sidebar></div>
+    
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" type="button" data-open-sidebar aria-label="Open navigation"><i data-lucide="menu"></i></button>
+          <span class="topbar-title">Audit & Security</span>
+        </div>
+        <div class="topbar-actions">
+          <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
+          <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
+          <button class="profile-button" type="button" onclick="logoutAdmin()"><span class="avatar">AD</span><span class="profile-copy"><strong>Admin Console</strong><small>Click to logout</small></span><i data-lucide="log-out" style="width:14px;height:14px;color:#8b95a7"></i></button>
+        </div>
+      </header>
+      
+      <main class="page-content">
+        <div class="page-heading">
+          <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>Audit & Security</h1><p>Review administrative actions and security events.</p></div>
+          <div class="heading-actions">
+            <button class="button" type="button" onclick="loadData()"><i data-lucide="refresh-cw"></i> Refresh</button>
+          </div>
+        </div>
+
+        <div class="alert-box" style="margin-bottom: 24px; display: flex; gap: 12px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <i data-lucide="shield-check" style="color: #64748b;"></i>
+          <div>
+            <strong style="display: block; font-size: 14px; color: #1e293b;">Audit integrity</strong>
+            <span style="font-size: 13px; color: #64748b;">All events are logged server-side and are protected against unauthorized alteration.</span>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Events today</span><span class="stat-icon"><i data-lucide="activity"></i></span></div>
+            <div class="stat-value" id="statEventsToday">...</div>
+            <div class="stat-foot">Live count</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Security alerts</span><span class="stat-icon"><i data-lucide="shield-alert"></i></span></div>
+            <div class="stat-value" id="statAlerts">...</div>
+            <div class="stat-foot"><span class="trend-down">Needs review</span></div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Failed logins</span><span class="stat-icon"><i data-lucide="lock-keyhole"></i></span></div>
+            <div class="stat-value" id="statFailedLogins">...</div>
+            <div class="stat-foot">Live count</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Privileged changes</span><span class="stat-icon"><i data-lucide="key-round"></i></span></div>
+            <div class="stat-value" id="statPrivileged">...</div>
+            <div class="stat-foot">Live count</div>
+          </article>
+        </div>
+
+        <div class="table-panel">
+          <div class="table-toolbar">
+            <div><h2>Audit event log</h2><p class="panel-subtitle">All system and user events.</p></div>
+            <div class="toolbar-controls">
+              <div class="table-search">
+                <i data-lucide="search"></i>
+                <input class="input-control" id="auditSearch" placeholder="Search events..." onkeyup="handleSearch()">
+              </div>
+              <select class="select-control" id="categoryFilter" style="width:150px" onchange="loadLogs()">
+                <option value="">All event types</option>
+                <option value="Authentication">Authentication</option>
+                <option value="Finance">Finance</option>
+                <option value="Permissions">Permissions</option>
+                <option value="Provider">Provider</option>
+                <option value="System">System</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="table-wrap">
+            <table id="audit-table">
+              <thead>
+                <tr><th>Timestamp</th><th>Actor</th><th>Event</th><th>Category</th><th>IP / context</th><th>Result</th><th>Action</th></tr>
+              </thead>
+              <tbody id="auditTableBody">
+                <tr><td colspan="7" style="text-align: center;">Loading logs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="table-footer">
+            <span id="tableInfo">Showing 0 events</span>
+            <div class="pagination" id="paginationControls"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><div><h2 class="panel-title">Security checklist</h2><p class="panel-subtitle">Review these controls with the backend developer.</p></div></div>
+          <div class="activity-list">
+            <label class="check-row"><input type="checkbox" checked> Require multi-factor authentication for privileged accounts.</label>
+            <label class="check-row"><input type="checkbox" checked> Rate-limit authentication and sensitive API endpoints.</label>
+            <label class="check-row"><input type="checkbox" checked> Record actor, action, target, timestamp and result for sensitive changes.</label>
+            <label class="check-row"><input type="checkbox" checked> Redact credentials, tokens and unnecessary personal data from logs.</label>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- 🟢 AUDIT DETAILS MODAL -->
+  <div class="modal-overlay" id="auditModal">
+    <div class="premium-modal">
+      <div class="modal-header">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 700;">Event Details</h2>
+        <button class="icon-button" onclick="closeModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-row"><span class="detail-label">Event</span><span class="detail-value" id="modalEvent">-</span></div>
+        <div class="detail-row"><span class="detail-label">Actor</span><span class="detail-value" id="modalActor">-</span></div>
+        <div class="detail-row"><span class="detail-label">Category</span><span class="detail-value" id="modalCategory">-</span></div>
+        <div class="detail-row"><span class="detail-label">IP Address</span><span class="detail-value" id="modalIp">-</span></div>
+        <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value" id="modalStatus">-</span></div>
+        <div class="detail-row"><span class="detail-label">Timestamp</span><span class="detail-value" id="modalTimestamp">-</span></div>
+      </div>
+      <div class="modal-footer"><button class="button" onclick="closeModal()">Close</button></div>
+    </div>
+  </div>
+  
+    <script>
+    const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000/api" 
+      : "https://numbahub-backend.onrender.com/api";
+
+    let currentPage = 1;
+    let searchQuery = "";
+    let currentLogs = [];
+
+    // 🟢 FIXED: Throws an error if the response is not OK
+    async function adminFetch(endpoint) {
+      const token = localStorage.getItem("adminToken");
+      if (!token) { window.location.href = "login.html"; return; }
+      
+      const res = await fetch(`${API_URL}${endpoint}`, { headers: { "Authorization": `Bearer ${token}` } });
+      if (res.status === 401 || res.status === 403) { 
+        localStorage.removeItem("adminToken"); 
+        window.location.href = "login.html"; 
+        return; 
+      }
+      
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Request failed");
+      }
+      return data;
+    }
+
+    async function loadSidebar() {
+      const host = document.getElementById("sidebar-host");
+      if (!host) return;
+      const isSubPage = window.location.pathname.includes('/pages/');
+      const rootPath = isSubPage ? '../' : './';
+      try {
+        const res = await fetch(`${rootPath}components/sidebar.html`);
+        let html = await res.text();
+        html = html.replace(/__ROOT__/g, rootPath);
+        host.innerHTML = html;
+        
+        const currentPage = document.body.dataset.page || 'dashboard';
+        const activeLink = host.querySelector(`a[data-nav="${currentPage}"]`);
+        if (activeLink) { activeLink.style.background = 'var(--brand)'; activeLink.style.color = '#fff'; }
+        if (window.lucide) lucide.createIcons();
+        
+        const sidebarLogoutBtn = host.querySelector('[data-action="logout"]');
+        if (sidebarLogoutBtn) sidebarLogoutBtn.addEventListener('click', logoutAdmin);
+        
+        const menuBtn = document.querySelector('[data-open-sidebar]');
+        const overlay = document.querySelector('[data-close-sidebar]');
+        const sidebar = document.getElementById('admin-sidebar');
+        if (menuBtn && overlay && sidebar) {
+          menuBtn.addEventListener('click', () => { sidebar.classList.add('open'); overlay.classList.add('active'); });
+          overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); });
+        }
+      } catch (err) { console.error("Sidebar error:", err); }
+    }
+
+    function logoutAdmin() {
+      localStorage.removeItem("adminToken");
+      window.location.href = "login.html";
+    }
+
+    async function loadStats() {
+      try {
+        const stats = await adminFetch("/admin/audit/stats");
+        document.getElementById("statEventsToday").textContent = stats.eventsToday.toLocaleString();
+        document.getElementById("statAlerts").textContent = stats.securityAlerts.toLocaleString();
+        document.getElementById("statFailedLogins").textContent = stats.failedLogins.toLocaleString();
+        document.getElementById("statPrivileged").textContent = stats.privilegedChanges.toLocaleString();
+      } catch (err) { 
+        console.error("Stats error:", err); 
+        document.getElementById("statEventsToday").textContent = "0";
+        document.getElementById("statAlerts").textContent = "0";
+        document.getElementById("statFailedLogins").textContent = "0";
+        document.getElementById("statPrivileged").textContent = "0";
+      }
+    }
+
+    async function loadLogs() {
+      const tbody = document.getElementById("auditTableBody");
+      const category = document.getElementById("categoryFilter").value;
+      const url = `/admin/audit/logs?page=${currentPage}&limit=10&search=${searchQuery}&category=${category}`;
+
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Loading...</td></tr>`;
+
+      try {
+        const data = await adminFetch(url);
+        currentLogs = data.logs; // Save for modal
+        
+        if (data.logs.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No events found.</td></tr>`;
+          document.getElementById("tableInfo").textContent = `Showing 0 events`;
+          document.getElementById("paginationControls").innerHTML = "";
+          return;
+        }
+
+        tbody.innerHTML = data.logs.map(log => {
+          const date = new Date(log.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          
+          let statusClass = "";
+          if (log.status === "Flagged") statusClass = "failed";
+          if (log.status === "Pending") statusClass = "pending";
+
+          return `
+            <tr>
+              <td>${date}</td>
+              <td>${log.actor}</td>
+              <td class="cell-primary">${log.event}</td>
+              <td>${log.category}</td>
+              <td>${log.ip}</td>
+              <td><span class="status ${statusClass}">${log.status}</span></td>
+              <td><button class="button button-small" onclick="openAuditModal('${log._id}')">Details</button></td>
+            </tr>
+          `;
+        }).join('');
+
+        document.getElementById("tableInfo").textContent = `Showing ${data.logs.length} of ${data.totalLogs} events`;
+        renderPagination(data.totalPages, data.currentPage);
+
+      } catch (err) {
+        console.error("Logs error:", err);
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">Failed to load audit logs: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderPagination(totalPages, current) {
+      const container = document.getElementById("paginationControls");
+      let html = "";
+      if (totalPages > 1) {
+        html += `<button ${current === 1 ? 'disabled' : ''} onclick="changePage(${current - 1})"><i data-lucide="chevron-left"></i></button>`;
+        for (let i = 1; i <= totalPages; i++) {
+          if (i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {
+            html += `<button class="${i === current ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+          } else if (i === current - 2 || i === current + 2) {
+            html += `<span>...</span>`;
+          }
+        }
+        html += `<button ${current === totalPages ? 'disabled' : ''} onclick="changePage(${current + 1})"><i data-lucide="chevron-right"></i></button>`;
+      }
+      container.innerHTML = html;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function changePage(page) { currentPage = page; loadLogs(); }
+
+    let searchTimeout;
+    function handleSearch() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        searchQuery = document.getElementById("auditSearch").value.trim();
+        currentPage = 1;
+        loadLogs();
+      }, 500);
+    }
+
+    function loadData() {
+      loadStats();
+      loadLogs();
+    }
+
+    window.openAuditModal = (id) => {
+      const log = currentLogs.find(l => l._id === id);
+      if (!log) return;
+
+      const date = new Date(log.createdAt).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      document.getElementById("modalEvent").textContent = log.event;
+      document.getElementById("modalActor").textContent = log.actor;
+      document.getElementById("modalCategory").textContent = log.category;
+      document.getElementById("modalIp").textContent = log.ip;
+      document.getElementById("modalStatus").textContent = log.status;
+      document.getElementById("modalTimestamp").textContent = date;
+
+      document.getElementById("auditModal").classList.add("active");
+    };
+
+    window.closeModal = () => {
+      document.getElementById("auditModal").classList.remove("active");
+    };
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (window.lucide) lucide.createIcons();
+      await loadSidebar();
+      loadData();
+    });
+  </script>
+</body>
+</html>

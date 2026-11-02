@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#3179df">
+  <title>Admin Sign In | NumbaHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+  <main class="login-page">
+    <section class="login-aside">
+      <a class="login-brand" href="index.html">
+        <span class="brand-mark">
+          <i data-lucide="layers"></i>
+        </span>
+        <span>NumbaHub</span>
+      </a>
+      <div class="login-message">
+        <h1>One platform.<br>Complete control.</h1>
+        <p>Manage services, customers, financial operations and platform health from one secure administration workspace.</p>
+        <div class="login-bullets">
+          <span><i data-lucide="shield-check"></i> Role-based administration</span>
+          <span><i data-lucide="activity"></i> Platform operations at a glance</span>
+          <span><i data-lucide="wallet"></i> Auditable financial workflows</span>
+        </div>
+      </div>
+    </section>
+    
+    <section class="login-content">
+      <div class="login-card">
+        <p class="eyebrow">ADMINISTRATOR ACCESS</p>
+        <h2>Welcome back</h2>
+        <p>Sign in to access the NumbaHub administration console.</p>
+        
+        <div id="loginError" style="display: none; background: #fef2f2; color: #991b1b; padding: 12px; border-radius: 8px; border: 1px solid #fecaca; margin-bottom: 20px; font-size: 14px;"></div>
+
+        <form id="admin-login-form">
+          <div class="field">
+            <label class="field-label" for="admin-email">Email address</label>
+            <input class="input-control" id="admin-email" type="email" autocomplete="username" placeholder="admin@example.com" required>
+          </div>
+          <div class="field">
+            <label class="field-label" for="admin-password">Password</label>
+            <input class="input-control" id="admin-password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+          </div>
+          
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 22px">
+            <label class="check-row">
+              <input type="checkbox" id="remember-admin"> Remember this device
+            </label>
+          </div>
+          
+          <button class="button button-primary" id="loginBtn" type="submit" style="width:100%;min-height:44px">
+            Sign in <i data-lucide="arrow-right"></i>
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.lucide) lucide.createIcons();
+      
+      const form = document.getElementById("admin-login-form");
+      const emailInput = document.getElementById("admin-email");
+      const passwordInput = document.getElementById("admin-password");
+      const loginBtn = document.getElementById("loginBtn");
+      const errorBox = document.getElementById("loginError");
+
+      const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+        ? "http://localhost:5000/api" 
+        : "https://numbahub-backend.onrender.com/api";
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errorBox.style.display = "none";
+        
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!email || !password) {
+          errorBox.textContent = "Please enter both email and password.";
+          errorBox.style.display = "block";
+          return;
+        }
+
+        const originalBtnHTML = loginBtn.innerHTML;
+        loginBtn.innerHTML = "Authenticating...";
+        loginBtn.disabled = true;
+
+        try {
+          const response = await fetch(`${API_URL}/admin/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || "Failed to login");
+          }
+
+          localStorage.setItem("adminToken", data.token);
+          localStorage.setItem("adminUser", JSON.stringify(data.admin));
+          
+          // 🟢 Redirect to the dashboard index.html
+          window.location.href = "index.html";
+
+        } catch (err) {
+          errorBox.textContent = err.message;
+          errorBox.style.display = "block";
+          loginBtn.innerHTML = originalBtnHTML;
+          loginBtn.disabled = false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

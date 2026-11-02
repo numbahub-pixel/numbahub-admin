@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#3179df">
+  <title>Reports | NumbaHub Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body data-page="reports">
+  <div class="app-shell">
+    <div id="sidebar-host"></div>
+    <div class="mobile-overlay" data-close-sidebar></div>
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" type="button" data-open-sidebar aria-label="Open navigation"><i data-lucide="menu"></i></button>
+          <span class="topbar-title">Reports</span>
+        </div>
+        <div class="topbar-actions">
+          <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
+          <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
+          <button class="profile-button" type="button" data-action="profile-menu"><span class="avatar">EA</span><span class="profile-copy"><strong>Elleks Admin</strong><small>Super Admin · Demo</small></span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#8b95a7"></i></button>
+        </div>
+      </header>
+      <main class="page-content">
+        <div class="page-heading">
+          <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>Reports</h1><p>Review operational and financial performance.</p></div>
+          <div class="heading-actions"><button class="button" type="button" data-action="refresh-page"><i data-lucide="refresh-cw"></i> Refresh</button><button class="button" type="button" data-action="help"><i data-lucide="circle-help"></i> Help</button></div>
+        </div>
+        <div class="demo-banner"><span class="status pending">Demo mode</span> <span style="font-size:11px;color:#8b6a35;margin-left:7px">Sample content only · no live backend actions are performed.</span></div>
+        <div class="alert-box"><i data-lucide="info"></i><div><strong>Reporting preview</strong>These visualizations and values are sample data. Connect reporting endpoints before using them for financial decisions.</div></div><div class="stats-grid"><article class="stat-card"><div class="stat-top"><span class="stat-label">Gross transaction value</span><span class="stat-icon"><i data-lucide="banknote"></i></span></div><div class="stat-value">₦8.42M</div><div class="stat-foot">Sample reporting period</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Estimated gross profit</span><span class="stat-icon"><i data-lucide="trending-up"></i></span></div><div class="stat-value">₦684K</div><div class="stat-foot">Before overhead and adjustments</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Order success rate</span><span class="stat-icon"><i data-lucide="check-circle"></i></span></div><div class="stat-value">96.4%</div><div class="stat-foot">Sample rate</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Active users</span><span class="stat-icon"><i data-lucide="users"></i></span></div><div class="stat-value">10,492</div><div class="stat-foot">Sample count</div></article></div>
+<div class="content-grid"><section class="panel"><div class="panel-header"><div><h2 class="panel-title">Service performance</h2><p class="panel-subtitle">Sample share of processed orders</p></div><button class="button button-small" data-action="export-report">Export report</button></div><div class="bar-list"><div class="bar-row"><span>Airtime</span><div class="bar-track"><div class="bar-fill" style="width:86%"></div></div><strong>86%</strong></div><div class="bar-row"><span>Receive SMS</span><div class="bar-track"><div class="bar-fill" style="width:72%"></div></div><strong>72%</strong></div><div class="bar-row"><span>Gift Cards</span><div class="bar-track"><div class="bar-fill" style="width:58%"></div></div><strong>58%</strong></div><div class="bar-row"><span>eSIM</span><div class="bar-track"><div class="bar-fill" style="width:48%"></div></div><strong>48%</strong></div><div class="bar-row"><span>Engagement</span><div class="bar-track"><div class="bar-fill" style="width:34%"></div></div><strong>34%</strong></div></div></section><section class="panel"><div class="panel-header"><div><h2 class="panel-title">Report filters</h2><p class="panel-subtitle">Choose a sample reporting window.</p></div></div><div class="field"><label class="field-label" for="report-period">Reporting period</label><select class="select-control" id="report-period"><option>Last 7 days</option><option>Last 30 days</option><option>This month</option><option>Last month</option><option>Custom range (API needed)</option></select></div><div class="field"><label class="field-label" for="report-service">Service</label><select class="select-control" id="report-service"><option>All services</option><option>Airtime</option><option>Receive SMS</option><option>Premium SMS</option><option>Number Rentals</option><option>eSIM</option><option>Gift Cards</option><option>Engagement</option></select></div><button class="button button-primary" data-action="apply-report">Apply filters</button></section></div>
+<div class="table-panel"><div class="table-toolbar"><div><h2>Report exports</h2><p class="panel-subtitle">Export only data your role is allowed to access.</p></div><button class="button" data-action="export-report"><i data-lucide="download"></i> Export summary CSV</button></div><div class="table-wrap"><table><thead><tr><th>Report</th><th>Includes</th><th>Access</th><th>Format</th><th>Action</th></tr></thead><tbody><tr><td class="cell-primary">Transaction summary</td><td>Counts, status, totals</td><td>Finance / Admin</td><td>CSV</td><td><button class="button button-small" data-action="export-report">Export demo</button></td></tr><tr><td class="cell-primary">Provider performance</td><td>Latency, errors, success rate</td><td>Operations / Admin</td><td>CSV</td><td><button class="button button-small" data-action="export-report">Export demo</button></td></tr><tr><td class="cell-primary">User growth</td><td>Registrations and activity</td><td>Admin / authorized staff</td><td>CSV</td><td><button class="button button-small" data-action="export-report">Export demo</button></td></tr></tbody></table></div></div>
+      </main>
+    </div>
+  </div>
+  <div class="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <div class="modal-backdrop" id="admin-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal"><div class="modal-header"><h2 id="modal-title">Details</h2><button class="icon-button" type="button" data-close-modal aria-label="Close dialog"><i data-lucide="x"></i></button></div><div class="modal-body" id="modal-body"></div><div class="modal-footer"><button class="button" type="button" data-close-modal>Close</button><button class="button button-primary" type="button" data-action="modal-confirm">Confirm demo action</button></div></div>
+  </div>
+  <script src="../assets/js/admin.js"></script>
+</body>
+</html>

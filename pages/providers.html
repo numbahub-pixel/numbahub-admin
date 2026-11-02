@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#3179df">
+  <title>Providers & APIs | NumbaHub Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body data-page="providers">
+  <div class="app-shell">
+    <div id="sidebar-host"></div>
+    <div class="mobile-overlay" data-close-sidebar></div>
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" type="button" data-open-sidebar aria-label="Open navigation"><i data-lucide="menu"></i></button>
+          <span class="topbar-title">Providers & APIs</span>
+        </div>
+        <div class="topbar-actions">
+          <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
+          <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
+          <button class="profile-button" type="button" data-action="profile-menu"><span class="avatar">EA</span><span class="profile-copy"><strong>Elleks Admin</strong><small>Super Admin · Demo</small></span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#8b95a7"></i></button>
+        </div>
+      </header>
+      <main class="page-content">
+        <div class="page-heading">
+          <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>Providers & APIs</h1><p>Manage integrations, service mappings and provider health.</p></div>
+          <div class="heading-actions"><button class="button" type="button" data-action="refresh-page"><i data-lucide="refresh-cw"></i> Refresh</button><button class="button" type="button" data-action="help"><i data-lucide="circle-help"></i> Help</button></div>
+        </div>
+        <div class="demo-banner"><span class="status pending">Demo mode</span> <span style="font-size:11px;color:#8b6a35;margin-left:7px">Sample content only · no live backend actions are performed.</span></div>
+        <div class="alert-box"><i data-lucide="shield-alert"></i><div><strong>Credential security</strong>Never put provider secrets in HTML, JavaScript, local storage, or public environment variables. The backend should store secrets and perform provider requests.</div></div><div class="stats-grid"><article class="stat-card"><div class="stat-top"><span class="stat-label">Configured providers</span><span class="stat-icon"><i data-lucide="plug"></i></span></div><div class="stat-value">4</div><div class="stat-foot">Demo records</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Healthy checks</span><span class="stat-icon"><i data-lucide="activity"></i></span></div><div class="stat-value">3 / 4</div><div class="stat-foot">Illustrative status only</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Error rate</span><span class="stat-icon"><i data-lucide="alert-triangle"></i></span></div><div class="stat-value">1.8%</div><div class="stat-foot">Sample metric</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Fallback routes</span><span class="stat-icon"><i data-lucide="git-branch"></i></span></div><div class="stat-value">2</div><div class="stat-foot">Requires backend support</div></article></div>
+<div class="table-panel"><div class="table-toolbar"><div><h2>Provider connections</h2><p class="panel-subtitle">Demo provider records — no live requests are made.</p></div><div class="toolbar-controls"><div class="table-search"><i data-lucide="search"></i><input class="input-control" placeholder="Search providers..." data-table-search="providers-table"></div><button class="button button-primary" data-action="add-provider"><i data-lucide="plus"></i> Add provider</button></div></div><div class="table-wrap"><table id="providers-table"><thead><tr><th>Provider</th><th>Services</th><th>Environment</th><th>Last check</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+<tr data-searchable><td><span class="cell-primary">Demo SMS Provider A</span><span class="cell-secondary">No credentials configured</span></td><td>Receive SMS, Rentals</td><td>Not connected</td><td>Not checked</td><td><span class="status pending">Setup required</span></td><td><button class="button button-small" data-action="configure-provider" data-record="Demo SMS Provider A">Configure</button></td></tr>
+<tr data-searchable><td><span class="cell-primary">Demo Airtime Provider</span><span class="cell-secondary">No credentials configured</span></td><td>Airtime</td><td>Not connected</td><td>Not checked</td><td><span class="status pending">Setup required</span></td><td><button class="button button-small" data-action="configure-provider" data-record="Demo Airtime Provider">Configure</button></td></tr>
+<tr data-searchable><td><span class="cell-primary">Demo Digital Goods</span><span class="cell-secondary">No credentials configured</span></td><td>eSIM, Gift Cards</td><td>Not connected</td><td>Not checked</td><td><span class="status pending">Setup required</span></td><td><button class="button button-small" data-action="configure-provider" data-record="Demo Digital Goods">Configure</button></td></tr>
+<tr data-searchable><td><span class="cell-primary">Demo Engagement API</span><span class="cell-secondary">No credentials configured</span></td><td>Engagement</td><td>Not connected</td><td>Not checked</td><td><span class="status inactive">Disabled</span></td><td><button class="button button-small" data-action="configure-provider" data-record="Demo Engagement API">Configure</button></td></tr>
+</tbody></table></div></div>
+<div class="panel"><div class="panel-header"><div><h2 class="panel-title">Integration readiness</h2><p class="panel-subtitle">Expected configuration before a provider can go live.</p></div></div><div class="metric-row"><div class="metric-box"><span>Server-side credentials</span><strong>Required</strong></div><div class="metric-box"><span>Timeouts and retries</span><strong>Required</strong></div><div class="metric-box"><span>Idempotency / duplicate protection</span><strong>Required</strong></div></div></div>
+      </main>
+    </div>
+  </div>
+  <div class="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <div class="modal-backdrop" id="admin-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal"><div class="modal-header"><h2 id="modal-title">Details</h2><button class="icon-button" type="button" data-close-modal aria-label="Close dialog"><i data-lucide="x"></i></button></div><div class="modal-body" id="modal-body"></div><div class="modal-footer"><button class="button" type="button" data-close-modal>Close</button><button class="button button-primary" type="button" data-action="modal-confirm">Confirm demo action</button></div></div>
+  </div>
+  <script src="../assets/js/admin.js"></script>
+</body>
+</html>
