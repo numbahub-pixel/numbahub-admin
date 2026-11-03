@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#3179df">
+  <title>Marketing & Notifications | NumbaHub Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body data-page="marketing">
+  <div class="app-shell">
+    <div id="sidebar-host"></div>
+    <div class="mobile-overlay" data-close-sidebar></div>
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" type="button" data-open-sidebar aria-label="Open navigation"><i data-lucide="menu"></i></button>
+          <span class="topbar-title">Marketing & Notifications</span>
+        </div>
+        <div class="topbar-actions">
+          <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
+          <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
+          <button class="profile-button" type="button" data-action="profile-menu"><span class="avatar">EA</span><span class="profile-copy"><strong>Elleks Admin</strong><small>Super Admin · Demo</small></span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#8b95a7"></i></button>
+        </div>
+      </header>
+      <main class="page-content">
+        <div class="page-heading">
+          <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>Marketing & Notifications</h1><p>Manage announcements, campaigns and referral settings.</p></div>
+          <div class="heading-actions"><button class="button" type="button" data-action="refresh-page"><i data-lucide="refresh-cw"></i> Refresh</button><button class="button" type="button" data-action="help"><i data-lucide="circle-help"></i> Help</button></div>
+        </div>
+        <div class="demo-banner"><span class="status pending">Demo mode</span> <span style="font-size:11px;color:#8b6a35;margin-left:7px">Sample content only · no live backend actions are performed.</span></div>
+        <div class="alert-box"><i data-lucide="info"></i><div><strong>Campaign delivery</strong>This page manages demo campaign records. Sending real emails, push notifications or SMS requires configured providers and backend endpoints.</div></div><div class="stats-grid"><article class="stat-card"><div class="stat-top"><span class="stat-label">Campaigns</span><span class="stat-icon"><i data-lucide="megaphone"></i></span></div><div class="stat-value">6</div><div class="stat-foot">Sample records</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Audience</span><span class="stat-icon"><i data-lucide="users"></i></span></div><div class="stat-value">8,420</div><div class="stat-foot">Illustrative audience</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Referral conversions</span><span class="stat-icon"><i data-lucide="git-branch"></i></span></div><div class="stat-value">324</div><div class="stat-foot">Sample count</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Scheduled notices</span><span class="stat-icon"><i data-lucide="calendar-clock"></i></span></div><div class="stat-value">2</div><div class="stat-foot">Sample count</div></article></div>
+<div class="content-grid"><section class="panel"><div class="panel-header"><div><h2 class="panel-title">Create announcement</h2><p class="panel-subtitle">Draft an in-app notice or promotional banner.</p></div></div><form data-demo-form="announcement-form" id="announcement-form"><div class="field"><label class="field-label" for="announcement-title">Announcement title</label><input class="input-control" id="announcement-title" required placeholder="e.g. Scheduled maintenance"></div><div class="field"><label class="field-label" for="announcement-channel">Channel</label><select class="select-control" id="announcement-channel"><option>In-app announcement</option><option>Dashboard banner</option><option>Email (requires integration)</option><option>Push notification (requires integration)</option></select></div><div class="field"><label class="field-label" for="announcement-message">Message</label><textarea class="textarea-control" id="announcement-message" required placeholder="Write a clear message for customers..."></textarea></div><label class="check-row"><input type="checkbox" id="announcement-draft" checked> Save as draft (recommended)</label><div class="form-actions"><button type="reset" class="button">Clear</button><button class="button button-primary" type="submit">Save announcement</button></div></form></section><section class="panel"><div class="panel-header"><div><h2 class="panel-title">Referral settings</h2><p class="panel-subtitle">Example settings, not persisted to the backend.</p></div></div><form data-demo-form="referral-form"><div class="field"><label class="field-label" for="referral-reward">Reward per qualified referral (₦)</label><input class="input-control" id="referral-reward" type="number" min="0" value="500"></div><div class="field"><label class="field-label" for="referral-min">Minimum qualifying spend (₦)</label><input class="input-control" id="referral-min" type="number" min="0" value="2000"></div><div class="field"><label class="field-label" for="referral-status">Campaign status</label><select class="select-control" id="referral-status"><option>Draft</option><option>Active</option><option>Paused</option></select></div><button class="button button-primary" type="submit">Save demo settings</button></form></section></div>
+<div class="table-panel"><div class="table-toolbar"><div><h2>Campaign history</h2><p class="panel-subtitle">Illustrative campaigns and delivery statuses.</p></div><button class="button" data-action="export-table" data-table="campaign-table"><i data-lucide="download"></i> Export</button></div><div class="table-wrap"><table id="campaign-table"><thead><tr><th>Campaign</th><th>Channel</th><th>Audience</th><th>Created</th><th>Status</th><th>Action</th></tr></thead><tbody><tr data-searchable><td class="cell-primary">Service update</td><td>In-app</td><td>All active users</td><td>Oct 17, 2026</td><td><span class="status">Published (demo)</span></td><td><button class="button button-small" data-action="view-record" data-record="Service update">View</button></td></tr><tr data-searchable><td class="cell-primary">New eSIM offers</td><td>Dashboard banner</td><td>Eligible users</td><td>Oct 16, 2026</td><td><span class="status pending">Draft</span></td><td><button class="button button-small" data-action="view-record" data-record="New eSIM offers">Edit</button></td></tr></tbody></table></div></div>
+      </main>
+    </div>
+  </div>
+  <div class="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <div class="modal-backdrop" id="admin-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal"><div class="modal-header"><h2 id="modal-title">Details</h2><button class="icon-button" type="button" data-close-modal aria-label="Close dialog"><i data-lucide="x"></i></button></div><div class="modal-body" id="modal-body"></div><div class="modal-footer"><button class="button" type="button" data-close-modal>Close</button><button class="button button-primary" type="button" data-action="modal-confirm">Confirm demo action</button></div></div>
+  </div>
+  <script src="../assets/js/admin.js"></script>
+</body>
+</html>

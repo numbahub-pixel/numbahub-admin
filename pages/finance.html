@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#3179df">
+  <title>Finance | NumbaHub Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body data-page="finance">
+  <div class="app-shell">
+    <div id="sidebar-host"></div>
+    <div class="mobile-overlay" data-close-sidebar></div>
+    
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" type="button" data-open-sidebar aria-label="Open navigation"><i data-lucide="menu"></i></button>
+          <span class="topbar-title">Finance</span>
+        </div>
+        <div class="topbar-actions">
+          <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
+          <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
+          <button class="profile-button" type="button" onclick="logoutAdmin()"><span class="avatar">AD</span><span class="profile-copy"><strong>Admin Console</strong><small>Click to logout</small></span><i data-lucide="log-out" style="width:14px;height:14px;color:#8b95a7"></i></button>
+        </div>
+      </header>
+      
+      <main class="page-content">
+        <div class="page-heading">
+          <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>Finance</h1><p>Review wallets, deposits, refunds and reconciliation.</p></div>
+          <div class="heading-actions">
+            <button class="button" type="button" onclick="loadData()"><i data-lucide="refresh-cw"></i> Refresh</button>
+          </div>
+        </div>
+        
+        <div class="alert-box" style="margin-bottom: 24px; display: flex; gap: 12px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <i data-lucide="info" style="color: #64748b;"></i>
+          <div>
+            <strong style="display: block; font-size: 14px; color: #1e293b;">Live financial data</strong>
+            <span style="font-size: 13px; color: #64748b;">This ledger shows real transactions processed on the platform.</span>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Deposits today</span><span class="stat-icon"><i data-lucide="arrow-down-left"></i></span></div>
+            <div class="stat-value" id="statDepositsToday">...</div>
+            <div class="stat-foot">Live volume</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Pending requests</span><span class="stat-icon"><i data-lucide="rotate-ccw"></i></span></div>
+            <div class="stat-value" id="statRefunds">...</div>
+            <div class="stat-foot"><span class="trend-down">Needs review</span></div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Wallet liabilities</span><span class="stat-icon"><i data-lucide="wallet"></i></span></div>
+            <div class="stat-value" id="statLiabilities">...</div>
+            <div class="stat-foot">Live ledger total</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Reconciliation</span><span class="stat-icon"><i data-lucide="scale"></i></span></div>
+            <div class="stat-value" id="statReconciliation">...</div>
+            <div class="stat-foot">Pending exceptions</div>
+          </article>
+        </div>
+
+        <div class="table-panel">
+          <div class="table-toolbar">
+            <div><h2>Financial ledger</h2><p class="panel-subtitle">Immutable ledger entries.</p></div>
+            <div class="toolbar-controls">
+              <div class="table-search">
+                <i data-lucide="search"></i>
+                <input class="input-control" id="ledgerSearch" placeholder="Search reference..." onkeyup="handleSearch()">
+              </div>
+              <select class="select-control" id="typeFilter" style="width:140px" onchange="loadLedger()">
+                <option value="">All types</option>
+                <option value="Deposit">Deposit</option>
+                <option value="Adjustment">Adjustment</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="table-wrap">
+            <table id="finance-table">
+              <thead>
+                <tr><th>Reference</th><th>Customer</th><th>Type</th><th>Amount</th><th>Channel</th><th>Status</th><th>Action</th></tr>
+              </thead>
+              <tbody id="ledgerTableBody">
+                <tr><td colspan="7" style="text-align: center;">Loading ledger...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="table-footer">
+            <span id="tableInfo">Showing 0 records</span>
+            <div class="pagination" id="paginationControls"></div>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <section class="panel">
+            <div class="panel-header"><div><h2 class="panel-title">Reconciliation checklist</h2><p class="panel-subtitle">Daily close controls</p></div></div>
+            <div class="activity-list">
+              <label class="check-row"><input type="checkbox"> Compare payment gateway settlements with recorded deposits.</label>
+              <label class="check-row"><input type="checkbox"> Confirm refund references and provider status.</label>
+              <label class="check-row"><input type="checkbox"> Investigate unmatched or duplicate references.</label>
+              <label class="check-row"><input type="checkbox"> Record reviewer and close-of-day timestamp.</label>
+            </div>
+          </section>
+          <section class="panel">
+            <div class="panel-header"><div><h2 class="panel-title">Financial control policy</h2><p class="panel-subtitle">Security guidelines</p></div></div>
+            <p class="panel-subtitle" style="line-height:1.8">Use an append-only ledger, idempotency keys, server-side authorization, explicit approval thresholds, and auditable reversals. Never use a browser-only balance edit as a real financial operation.</p>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+  
+  <script>
+    const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000/api" 
+      : "https://numbahub-backend.onrender.com/api";
+
+    let currentPage = 1;
+    let searchQuery = "";
+
+    async function adminFetch(endpoint) {
+      const token = localStorage.getItem("adminToken");
+      if (!token) { window.location.href = "login.html"; return; }
+      const res = await fetch(`${API_URL}${endpoint}`, { headers: { "Authorization": `Bearer ${token}` } });
+      if (res.status === 401 || res.status === 403) { localStorage.removeItem("adminToken"); window.location.href = "login.html"; return; }
+      return await res.json();
+    }
+
+    async function loadSidebar() {
+      const host = document.getElementById("sidebar-host");
+      if (!host) return;
+      const isSubPage = window.location.pathname.includes('/pages/');
+      const rootPath = isSubPage ? '../' : './';
+      try {
+        const res = await fetch(`${rootPath}components/sidebar.html`);
+        let html = await res.text();
+        html = html.replace(/__ROOT__/g, rootPath);
+        host.innerHTML = html;
+        
+        const currentPage = document.body.dataset.page || 'dashboard';
+        const activeLink = host.querySelector(`a[data-nav="${currentPage}"]`);
+        if (activeLink) { activeLink.style.background = 'var(--brand)'; activeLink.style.color = '#fff'; }
+        if (window.lucide) lucide.createIcons();
+        
+        const sidebarLogoutBtn = host.querySelector('[data-action="logout"]');
+        if (sidebarLogoutBtn) sidebarLogoutBtn.addEventListener('click', logoutAdmin);
+        
+        const menuBtn = document.querySelector('[data-open-sidebar]');
+        const overlay = document.querySelector('[data-close-sidebar]');
+        const sidebar = document.getElementById('admin-sidebar');
+        if (menuBtn && overlay && sidebar) {
+          menuBtn.addEventListener('click', () => { sidebar.classList.add('open'); overlay.classList.add('active'); });
+          overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); });
+        }
+      } catch (err) { console.error("Sidebar error:", err); }
+    }
+
+    function logoutAdmin() {
+      localStorage.removeItem("adminToken");
+      window.location.href = "login.html";
+    }
+
+    async function loadStats() {
+      try {
+        const stats = await adminFetch("/admin/finance/stats");
+        document.getElementById("statDepositsToday").textContent = `₦${stats.depositsToday.toLocaleString()}`;
+        document.getElementById("statRefunds").textContent = stats.refundRequests;
+        document.getElementById("statLiabilities").textContent = `₦${stats.walletLiabilities.toLocaleString()}`;
+        document.getElementById("statReconciliation").textContent = stats.reconciliation;
+      } catch (err) { console.error("Stats error:", err); }
+    }
+
+    async function loadLedger() {
+      const tbody = document.getElementById("ledgerTableBody");
+      const type = document.getElementById("typeFilter").value;
+      const url = `/admin/finance/ledger?page=${currentPage}&limit=10&search=${searchQuery}&type=${type}`;
+
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Loading...</td></tr>`;
+
+      try {
+        const data = await adminFetch(url);
+        
+        if (data.transactions.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No records found.</td></tr>`;
+          document.getElementById("tableInfo").textContent = `Showing 0 records`;
+          document.getElementById("paginationControls").innerHTML = "";
+          return;
+        }
+
+        tbody.innerHTML = data.transactions.map(tx => {
+          // Format the type based on service
+          let displayType = tx.service.replace('_', ' ');
+          displayType = displayType.charAt(0).toUpperCase() + displayType.slice(1);
+          
+          // Map internal status to UI styling
+          let statusClass = "";
+          if (tx.status === "pending") statusClass = "pending";
+          if (tx.status === "successful") statusClass = ""; // default green
+          if (tx.status === "failed") statusClass = "suspended"; // red
+
+          // Customer name
+          const customer = tx.user ? `${tx.user.firstName} ${tx.user.lastName}` : 'Unknown';
+
+          return `
+            <tr>
+              <td class="cell-primary">${tx.reference}</td>
+              <td>${customer}</td>
+              <td>${displayType}</td>
+              <td>₦${tx.amount.toLocaleString()}</td>
+              <td>${tx.provider || 'System'}</td>
+              <td><span class="status ${statusClass}">${tx.status}</span></td>
+              <td><button class="button button-small" onclick="alert('Transaction detail view coming soon.')">View</button></td>
+            </tr>
+          `;
+        }).join('');
+
+        document.getElementById("tableInfo").textContent = `Showing ${data.transactions.length} of ${data.totalTransactions} records`;
+        renderPagination(data.totalPages, data.currentPage);
+
+      } catch (err) {
+        console.error("Ledger error:", err);
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">Failed to load ledger.</td></tr>`;
+      }
+    }
+
+    function renderPagination(totalPages, current) {
+      const container = document.getElementById("paginationControls");
+      let html = "";
+      if (totalPages > 1) {
+        html += `<button ${current === 1 ? 'disabled' : ''} onclick="changePage(${current - 1})"><i data-lucide="chevron-left"></i></button>`;
+        for (let i = 1; i <= totalPages; i++) {
+          if (i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {
+            html += `<button class="${i === current ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+          } else if (i === current - 2 || i === current + 2) {
+            html += `<span>...</span>`;
+          }
+        }
+        html += `<button ${current === totalPages ? 'disabled' : ''} onclick="changePage(${current + 1})"><i data-lucide="chevron-right"></i></button>`;
+      }
+      container.innerHTML = html;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function changePage(page) { currentPage = page; loadLedger(); }
+
+    let searchTimeout;
+    function handleSearch() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        searchQuery = document.getElementById("ledgerSearch").value.trim();
+        currentPage = 1;
+        loadLedger();
+      }, 500);
+    }
+
+    function loadData() {
+      loadStats();
+      loadLedger();
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (window.lucide) lucide.createIcons();
+      await loadSidebar();
+      loadData();
+    });
+  </script>
+</body>
+</html>
