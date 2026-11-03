@@ -8,11 +8,28 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="../assets/css/admin.css">
+  <style>
+    /* Premium Modal Styles */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 16px; opacity: 0; visibility: hidden; transition: all 0.2s ease; }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .premium-modal { background: #fff; width: 100%; max-width: 700px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: translateY(20px); transition: transform 0.2s ease; overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; }
+    .modal-overlay.active .premium-modal { transform: translateY(0); }
+    .modal-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
+    .modal-body { padding: 24px; overflow-y: auto; flex: 1; background: #f8fafc; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid #e2e8f0; background: #fff; }
+    
+    /* Chat Bubbles */
+    .chat-bubble { max-width: 80%; padding: 12px 16px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; line-height: 1.5; }
+    .chat-user { background: #fff; border: 1px solid #e2e8f0; color: #1e293b; align-self: flex-start; border-bottom-left-radius: 2px; }
+    .chat-admin { background: var(--brand); color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; margin-left: auto; }
+    .chat-meta { font-size: 11px; margin-bottom: 4px; opacity: 0.7; display: block; }
+  </style>
 </head>
 <body data-page="support">
   <div class="app-shell">
     <div id="sidebar-host"></div>
     <div class="mobile-overlay" data-close-sidebar></div>
+    
     <div class="main-area">
       <header class="topbar">
         <div class="topbar-left">
@@ -22,29 +39,396 @@
         <div class="topbar-actions">
           <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
           <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
-          <button class="profile-button" type="button" data-action="profile-menu"><span class="avatar">EA</span><span class="profile-copy"><strong>Elleks Admin</strong><small>Super Admin · Demo</small></span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#8b95a7"></i></button>
+          <button class="profile-button" type="button" onclick="logoutAdmin()"><span class="avatar">AD</span><span class="profile-copy"><strong>Admin Console</strong><small>Click to logout</small></span><i data-lucide="log-out" style="width:14px;height:14px;color:#8b95a7"></i></button>
         </div>
       </header>
+      
       <main class="page-content">
         <div class="page-heading">
           <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>Customer Support</h1><p>Review tickets and coordinate customer resolutions.</p></div>
-          <div class="heading-actions"><button class="button" type="button" data-action="refresh-page"><i data-lucide="refresh-cw"></i> Refresh</button><button class="button" type="button" data-action="help"><i data-lucide="circle-help"></i> Help</button></div>
+          <div class="heading-actions">
+            <button class="button" type="button" onclick="loadData()"><i data-lucide="refresh-cw"></i> Refresh</button>
+          </div>
         </div>
-        <div class="demo-banner"><span class="status pending">Demo mode</span> <span style="font-size:11px;color:#8b6a35;margin-left:7px">Sample content only · no live backend actions are performed.</span></div>
-        <div class="stats-grid"><article class="stat-card"><div class="stat-top"><span class="stat-label">Open tickets</span><span class="stat-icon"><i data-lucide="inbox"></i></span></div><div class="stat-value">24</div><div class="stat-foot">Sample count</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Urgent</span><span class="stat-icon"><i data-lucide="alert-triangle"></i></span></div><div class="stat-value">3</div><div class="stat-foot"><span class="trend-down">Review promptly</span></div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Awaiting customer</span><span class="stat-icon"><i data-lucide="message-circle"></i></span></div><div class="stat-value">8</div><div class="stat-foot">Sample count</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Resolved today</span><span class="stat-icon"><i data-lucide="check-check"></i></span></div><div class="stat-value">41</div><div class="stat-foot">Sample count</div></article></div>
-<div class="table-panel"><div class="table-toolbar"><div><h2>Support tickets</h2><p class="panel-subtitle">Demo tickets for interface preview.</p></div><div class="toolbar-controls"><div class="table-search"><i data-lucide="search"></i><input class="input-control" placeholder="Search tickets..." data-table-search="support-table"></div><select class="select-control" style="width:140px" data-table-filter="support-table"><option value="">All priorities</option><option>Urgent</option><option>High</option><option>Normal</option></select><button class="button button-primary" data-action="create-ticket"><i data-lucide="plus"></i> New ticket</button></div></div><div class="table-wrap"><table id="support-table"><thead><tr><th>Ticket</th><th>Customer</th><th>Subject</th><th>Priority</th><th>Assigned to</th><th>Status</th><th>Updated</th><th>Action</th></tr></thead><tbody>
-<tr data-searchable><td class="cell-primary">DEMO-TKT-218</td><td>Amaka Okafor</td><td>Deposit not reflected</td><td><span class="status failed">Urgent</span></td><td>Tunde Ops</td><td><span class="status pending">Open</span></td><td>8 min ago</td><td><button class="button button-small" data-action="view-record" data-record="DEMO-TKT-218">Open</button></td></tr>
-<tr data-searchable><td class="cell-primary">DEMO-TKT-217</td><td>Daniel Yusuf</td><td>SMS not received</td><td><span class="status pending">High</span></td><td>Support Team</td><td><span class="status pending">Open</span></td><td>24 min ago</td><td><button class="button button-small" data-action="view-record" data-record="DEMO-TKT-217">Open</button></td></tr>
-<tr data-searchable><td class="cell-primary">DEMO-TKT-216</td><td>Mary James</td><td>Refund status request</td><td><span class="status neutral">Normal</span></td><td>Feyi K.</td><td><span class="status info">Pending</span></td><td>1 hour ago</td><td><button class="button button-small" data-action="view-record" data-record="DEMO-TKT-216">Open</button></td></tr>
-<tr data-searchable><td class="cell-primary">DEMO-TKT-215</td><td>Ibrahim Bello</td><td>Account access</td><td><span class="status neutral">Normal</span></td><td>Support Team</td><td><span class="status">Resolved</span></td><td>Yesterday</td><td><button class="button button-small" data-action="view-record" data-record="DEMO-TKT-215">Open</button></td></tr>
-</tbody></table></div></div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Open tickets</span><span class="stat-icon"><i data-lucide="inbox"></i></span></div>
+            <div class="stat-value" id="statOpen">...</div>
+            <div class="stat-foot">Needs attention</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Urgent</span><span class="stat-icon"><i data-lucide="alert-triangle"></i></span></div>
+            <div class="stat-value" id="statUrgent">...</div>
+            <div class="stat-foot"><span class="trend-down">Review promptly</span></div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Awaiting customer</span><span class="stat-icon"><i data-lucide="message-circle"></i></span></div>
+            <div class="stat-value" id="statPending">...</div>
+            <div class="stat-foot">Pending reply</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Resolved today</span><span class="stat-icon"><i data-lucide="check-check"></i></span></div>
+            <div class="stat-value" id="statResolved">...</div>
+            <div class="stat-foot">Great job!</div>
+          </article>
+        </div>
+
+        <div class="table-panel">
+          <div class="table-toolbar">
+            <div><h2>Support tickets</h2><p class="panel-subtitle">Live customer inquiries.</p></div>
+            <div class="toolbar-controls">
+              <div class="table-search">
+                <i data-lucide="search"></i>
+                <input class="input-control" id="ticketSearch" placeholder="Search tickets..." onkeyup="handleSearch()">
+              </div>
+              <select class="select-control" id="priorityFilter" style="width:140px" onchange="loadTickets()">
+                <option value="">All priorities</option>
+                <option value="Urgent">Urgent</option>
+                <option value="High">High</option>
+                <option value="Normal">Normal</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="table-wrap">
+            <table id="support-table">
+              <thead>
+                <tr><th>Ticket</th><th>Customer</th><th>Subject</th><th>Priority</th><th>Assigned to</th><th>Status</th><th>Updated</th><th>Action</th></tr>
+              </thead>
+              <tbody id="ticketTableBody">
+                <tr><td colspan="8" style="text-align: center;">Loading tickets...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="table-footer">
+            <span id="tableInfo">Showing 0 tickets</span>
+            <div class="pagination" id="paginationControls"></div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
-  <div class="toast-region" aria-live="polite" aria-atomic="true"></div>
-  <div class="modal-backdrop" id="admin-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal"><div class="modal-header"><h2 id="modal-title">Details</h2><button class="icon-button" type="button" data-close-modal aria-label="Close dialog"><i data-lucide="x"></i></button></div><div class="modal-body" id="modal-body"></div><div class="modal-footer"><button class="button" type="button" data-close-modal>Close</button><button class="button button-primary" type="button" data-action="modal-confirm">Confirm demo action</button></div></div>
+
+  <!-- 🟢 CHAT MODAL -->
+  <div class="modal-overlay" id="ticketModal">
+    <div class="premium-modal">
+      <div class="modal-header">
+        <div>
+          <h2 style="margin: 0; font-size: 18px; font-weight: 700;" id="modalSubject">Ticket Subject</h2>
+          <div style="font-size: 13px; color: #64748b; margin-top: 4px;" id="modalCustomer">Customer Name</div>
+        </div>
+        <button class="icon-button" onclick="closeModal()"><i data-lucide="x"></i></button>
+      </div>
+      
+      <!-- Controls -->
+      <div style="padding: 16px 24px; border-bottom: 1px solid #e2e8f0; display: flex; gap: 16px; background: #fff;">
+        <div style="flex: 1;">
+          <label style="font-size: 12px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">Status</label>
+          <select id="modalStatus" class="input-control" style="padding: 8px; height: 38px;" onchange="updateTicketMeta()">
+            <option value="Open">Open</option>
+            <option value="Pending">Pending</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: 12px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">Priority</label>
+          <select id="modalPriority" class="input-control" style="padding: 8px; height: 38px;" onchange="updateTicketMeta()">
+            <option value="Normal">Normal</option>
+            <option value="High">High</option>
+            <option value="Urgent">Urgent</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-body" id="chatContainer" style="display: flex; flex-direction: column;">
+        <!-- Chat messages injected here -->
+      </div>
+      
+      <div class="modal-footer">
+        <div style="display: flex; gap: 10px;">
+          <input type="text" id="replyInput" class="input-control" placeholder="Type your reply here..." style="flex: 1;" onkeypress="handleReplyEnter(event)">
+          <button class="button button-primary" id="sendReplyBtn" onclick="sendReply()">Send Reply</button>
+        </div>
+      </div>
+    </div>
   </div>
-  <script src="../assets/js/admin.js"></script>
+  
+  <script>
+    const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000/api" 
+      : "https://numbahub-backend.onrender.com/api";
+
+    let currentPage = 1;
+    let searchQuery = "";
+    let activeTicketId = null;
+
+    async function adminFetch(endpoint, options = {}) {
+      const token = localStorage.getItem("adminToken");
+      if (!token) { window.location.href = "login.html"; return; }
+      const res = await fetch(`${API_URL}${endpoint}`, { 
+        ...options,
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", ...options.headers } 
+      });
+      if (res.status === 401 || res.status === 403) { localStorage.removeItem("adminToken"); window.location.href = "login.html"; return; }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Request failed");
+      return data;
+    }
+
+    async function loadSidebar() {
+      const host = document.getElementById("sidebar-host");
+      if (!host) return;
+      const isSubPage = window.location.pathname.includes('/pages/');
+      const rootPath = isSubPage ? '../' : './';
+      try {
+        const res = await fetch(`${rootPath}components/sidebar.html`);
+        let html = await res.text();
+        html = html.replace(/__ROOT__/g, rootPath);
+        host.innerHTML = html;
+        
+        const adminUser = JSON.parse(localStorage.getItem("adminUser") || "{}");
+        if (adminUser.firstName) {
+          document.getElementById("sidebarAdminName").textContent = `${adminUser.firstName} ${adminUser.lastName || ''}`.trim();
+          document.getElementById("sidebarAdminEmail").textContent = adminUser.email;
+        }
+
+        const currentPage = document.body.dataset.page || 'dashboard';
+        const activeLink = host.querySelector(`a[data-nav="${currentPage}"]`);
+        if (activeLink) { activeLink.style.background = 'var(--brand)'; activeLink.style.color = '#fff'; }
+        if (window.lucide) lucide.createIcons();
+        
+        const sidebarLogoutBtn = host.querySelector('[data-action="logout"]');
+        if (sidebarLogoutBtn) sidebarLogoutBtn.addEventListener('click', logoutAdmin);
+        
+        const menuBtn = document.querySelector('[data-open-sidebar]');
+        const overlay = document.querySelector('[data-close-sidebar]');
+        const sidebar = document.getElementById('admin-sidebar');
+        if (menuBtn && overlay && sidebar) {
+          menuBtn.addEventListener('click', () => { sidebar.classList.add('open'); overlay.classList.add('active'); });
+          overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); });
+        }
+      } catch (err) { console.error("Sidebar error:", err); }
+    }
+
+    function logoutAdmin() {
+      localStorage.removeItem("adminToken");
+      window.location.href = "login.html";
+    }
+
+    async function loadStats() {
+      try {
+        const stats = await adminFetch("/admin/support/stats");
+        document.getElementById("statOpen").textContent = stats.openTickets.toLocaleString();
+        document.getElementById("statUrgent").textContent = stats.urgentTickets.toLocaleString();
+        document.getElementById("statPending").textContent = stats.pendingTickets.toLocaleString();
+        document.getElementById("statResolved").textContent = stats.resolvedToday.toLocaleString();
+      } catch (err) { console.error("Stats error:", err); }
+    }
+
+    async function loadTickets() {
+      const tbody = document.getElementById("ticketTableBody");
+      const priority = document.getElementById("priorityFilter").value;
+      const url = `/admin/support/tickets?page=${currentPage}&limit=10&search=${searchQuery}&priority=${priority}`;
+
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align: center;">Loading...</td></tr>`;
+
+      try {
+        const data = await adminFetch(url);
+        
+        if (data.tickets.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align: center;">No tickets found.</td></tr>`;
+          document.getElementById("tableInfo").textContent = `Showing 0 tickets`;
+          document.getElementById("paginationControls").innerHTML = "";
+          return;
+        }
+
+        tbody.innerHTML = data.tickets.map(t => {
+          const customer = t.user ? `${t.user.firstName} ${t.user.lastName}` : 'Unknown';
+          const assignee = t.assignedTo ? `${t.assignedTo.firstName}` : 'Unassigned';
+          const date = new Date(t.updatedAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+          
+          let priorityClass = t.priority === "Urgent" ? "failed" : t.priority === "High" ? "pending" : "neutral";
+          let statusClass = t.status === "Open" ? "pending" : t.status === "Resolved" ? "" : "info";
+
+          return `
+            <tr>
+              <td class="cell-primary">${t.ticketId}</td>
+              <td>${customer}</td>
+              <td>${t.subject}</td>
+              <td><span class="status ${priorityClass}">${t.priority}</span></td>
+              <td>${assignee}</td>
+              <td><span class="status ${statusClass}">${t.status}</span></td>
+              <td>${date}</td>
+              <td><button class="button button-small" onclick="openTicket('${t._id}')">Open</button></td>
+            </tr>
+          `;
+        }).join('');
+
+        document.getElementById("tableInfo").textContent = `Showing ${data.tickets.length} of ${data.totalTickets} tickets`;
+        renderPagination(data.totalPages, data.currentPage);
+
+      } catch (err) {
+        console.error("Tickets error:", err);
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: red;">Failed to load tickets.</td></tr>`;
+      }
+    }
+
+    function renderPagination(totalPages, current) {
+      const container = document.getElementById("paginationControls");
+      let html = "";
+      if (totalPages > 1) {
+        html += `<button ${current === 1 ? 'disabled' : ''} onclick="changePage(${current - 1})"><i data-lucide="chevron-left"></i></button>`;
+        for (let i = 1; i <= totalPages; i++) {
+          if (i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {
+            html += `<button class="${i === current ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+          } else if (i === current - 2 || i === current + 2) {
+            html += `<span>...</span>`;
+          }
+        }
+        html += `<button ${current === totalPages ? 'disabled' : ''} onclick="changePage(${current + 1})"><i data-lucide="chevron-right"></i></button>`;
+      }
+      container.innerHTML = html;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function changePage(page) { currentPage = page; loadTickets(); }
+
+    let searchTimeout;
+    function handleSearch() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        searchQuery = document.getElementById("ticketSearch").value.trim();
+        currentPage = 1;
+        loadTickets();
+      }, 500);
+    }
+
+    function loadData() {
+      loadStats();
+      loadTickets();
+    }
+
+    // 🟢 TICKET MODAL & CHAT LOGIC
+    window.openTicket = async (id) => {
+      activeTicketId = id;
+      const modal = document.getElementById("ticketModal");
+      const chatContainer = document.getElementById("chatContainer");
+      
+      modal.classList.add("active");
+      chatContainer.innerHTML = `<p style="text-align: center; color: #64748b;">Loading conversation...</p>`;
+
+      try {
+        const ticket = await adminFetch(`/admin/support/tickets/${id}`);
+        
+        document.getElementById("modalSubject").textContent = ticket.subject;
+        document.getElementById("modalCustomer").textContent = `${ticket.user.firstName} ${ticket.user.lastName} (${ticket.user.email})`;
+        document.getElementById("modalStatus").value = ticket.status;
+        document.getElementById("modalPriority").value = ticket.priority;
+
+        let chatHtml = `
+          <!-- Original Message -->
+          <div class="chat-bubble chat-user">
+            <span class="chat-meta">${ticket.user.firstName} • ${new Date(ticket.createdAt).toLocaleString()}</span>
+            ${ticket.message}
+          </div>
+        `;
+
+        // Replies
+        ticket.replies.forEach(reply => {
+          const isAdmin = reply.senderName.includes("Support");
+          chatHtml += `
+            <div class="chat-bubble ${isAdmin ? 'chat-admin' : 'chat-user'}">
+              <span class="chat-meta" style="${isAdmin ? 'color: rgba(255,255,255,0.8);' : ''}">${reply.senderName} • ${new Date(reply.createdAt).toLocaleString()}</span>
+              ${reply.message}
+            </div>
+          `;
+        });
+
+        chatContainer.innerHTML = chatHtml;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        document.getElementById("replyInput").focus();
+
+      } catch (err) {
+        chatContainer.innerHTML = `<p style="text-align: center; color: red;">Failed to load conversation.</p>`;
+      }
+    };
+
+    window.closeModal = () => {
+      document.getElementById("ticketModal").classList.remove("active");
+      activeTicketId = null;
+      loadData(); // Refresh table to show updated statuses
+    };
+
+    window.updateTicketMeta = async () => {
+      if (!activeTicketId) return;
+      const status = document.getElementById("modalStatus").value;
+      const priority = document.getElementById("modalPriority").value;
+      
+      try {
+        await adminFetch(`/admin/support/tickets/${activeTicketId}`, {
+          method: "PUT",
+          body: JSON.stringify({ status, priority })
+        });
+      } catch (err) {
+        alert("Failed to update ticket details");
+      }
+    };
+
+    window.handleReplyEnter = (e) => {
+      if (e.key === "Enter") sendReply();
+    };
+
+    window.sendReply = async () => {
+      if (!activeTicketId) return;
+      const input = document.getElementById("replyInput");
+      const message = input.value.trim();
+      if (!message) return;
+
+      const btn = document.getElementById("sendReplyBtn");
+      btn.disabled = true;
+      btn.textContent = "Sending...";
+      input.disabled = true;
+
+      try {
+        const res = await adminFetch(`/admin/support/tickets/${activeTicketId}/reply`, {
+          method: "POST",
+          body: JSON.stringify({ message })
+        });
+        
+        // Append to UI instantly
+        const chatContainer = document.getElementById("chatContainer");
+        chatContainer.innerHTML += `
+          <div class="chat-bubble chat-admin">
+            <span class="chat-meta" style="color: rgba(255,255,255,0.8);">You • Just now</span>
+            ${message}
+          </div>
+        `;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        
+        input.value = "";
+        
+        // Update Status dropdown if it changed from Open -> Pending
+        if (res.ticket.status === "Pending" && document.getElementById("modalStatus").value === "Open") {
+          document.getElementById("modalStatus").value = "Pending";
+        }
+
+      } catch (err) {
+        alert(err.message || "Failed to send reply");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Send Reply";
+        input.disabled = false;
+        input.focus();
+      }
+    };
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (window.lucide) lucide.createIcons();
+      await loadSidebar();
+      loadData();
+    });
+  </script>
 </body>
 </html>

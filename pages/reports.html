@@ -8,11 +8,20 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="../assets/css/admin.css">
+  <style>
+    /* Progress Bar Styles */
+    .bar-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; font-size: 14px; }
+    .bar-row span { width: 120px; font-weight: 500; color: #475569; text-transform: capitalize; }
+    .bar-track { flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--brand); border-radius: 4px; transition: width 0.5s ease-out; }
+    .bar-row strong { width: 40px; text-align: right; color: #1e293b; font-weight: 600; }
+  </style>
 </head>
 <body data-page="reports">
   <div class="app-shell">
     <div id="sidebar-host"></div>
     <div class="mobile-overlay" data-close-sidebar></div>
+    
     <div class="main-area">
       <header class="topbar">
         <div class="topbar-left">
@@ -22,25 +31,264 @@
         <div class="topbar-actions">
           <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
           <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
-          <button class="profile-button" type="button" data-action="profile-menu"><span class="avatar">EA</span><span class="profile-copy"><strong>Elleks Admin</strong><small>Super Admin · Demo</small></span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#8b95a7"></i></button>
+          <button class="profile-button" type="button" onclick="logoutAdmin()"><span class="avatar">AD</span><span class="profile-copy"><strong>Admin Console</strong><small>Click to logout</small></span><i data-lucide="log-out" style="width:14px;height:14px;color:#8b95a7"></i></button>
         </div>
       </header>
+      
       <main class="page-content">
         <div class="page-heading">
           <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>Reports</h1><p>Review operational and financial performance.</p></div>
-          <div class="heading-actions"><button class="button" type="button" data-action="refresh-page"><i data-lucide="refresh-cw"></i> Refresh</button><button class="button" type="button" data-action="help"><i data-lucide="circle-help"></i> Help</button></div>
+          <div class="heading-actions">
+            <button class="button" type="button" onclick="loadAllData()"><i data-lucide="refresh-cw"></i> Refresh</button>
+          </div>
         </div>
-        <div class="demo-banner"><span class="status pending">Demo mode</span> <span style="font-size:11px;color:#8b6a35;margin-left:7px">Sample content only · no live backend actions are performed.</span></div>
-        <div class="alert-box"><i data-lucide="info"></i><div><strong>Reporting preview</strong>These visualizations and values are sample data. Connect reporting endpoints before using them for financial decisions.</div></div><div class="stats-grid"><article class="stat-card"><div class="stat-top"><span class="stat-label">Gross transaction value</span><span class="stat-icon"><i data-lucide="banknote"></i></span></div><div class="stat-value">₦8.42M</div><div class="stat-foot">Sample reporting period</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Estimated gross profit</span><span class="stat-icon"><i data-lucide="trending-up"></i></span></div><div class="stat-value">₦684K</div><div class="stat-foot">Before overhead and adjustments</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Order success rate</span><span class="stat-icon"><i data-lucide="check-circle"></i></span></div><div class="stat-value">96.4%</div><div class="stat-foot">Sample rate</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Active users</span><span class="stat-icon"><i data-lucide="users"></i></span></div><div class="stat-value">10,492</div><div class="stat-foot">Sample count</div></article></div>
-<div class="content-grid"><section class="panel"><div class="panel-header"><div><h2 class="panel-title">Service performance</h2><p class="panel-subtitle">Sample share of processed orders</p></div><button class="button button-small" data-action="export-report">Export report</button></div><div class="bar-list"><div class="bar-row"><span>Airtime</span><div class="bar-track"><div class="bar-fill" style="width:86%"></div></div><strong>86%</strong></div><div class="bar-row"><span>Receive SMS</span><div class="bar-track"><div class="bar-fill" style="width:72%"></div></div><strong>72%</strong></div><div class="bar-row"><span>Gift Cards</span><div class="bar-track"><div class="bar-fill" style="width:58%"></div></div><strong>58%</strong></div><div class="bar-row"><span>eSIM</span><div class="bar-track"><div class="bar-fill" style="width:48%"></div></div><strong>48%</strong></div><div class="bar-row"><span>Engagement</span><div class="bar-track"><div class="bar-fill" style="width:34%"></div></div><strong>34%</strong></div></div></section><section class="panel"><div class="panel-header"><div><h2 class="panel-title">Report filters</h2><p class="panel-subtitle">Choose a sample reporting window.</p></div></div><div class="field"><label class="field-label" for="report-period">Reporting period</label><select class="select-control" id="report-period"><option>Last 7 days</option><option>Last 30 days</option><option>This month</option><option>Last month</option><option>Custom range (API needed)</option></select></div><div class="field"><label class="field-label" for="report-service">Service</label><select class="select-control" id="report-service"><option>All services</option><option>Airtime</option><option>Receive SMS</option><option>Premium SMS</option><option>Number Rentals</option><option>eSIM</option><option>Gift Cards</option><option>Engagement</option></select></div><button class="button button-primary" data-action="apply-report">Apply filters</button></section></div>
-<div class="table-panel"><div class="table-toolbar"><div><h2>Report exports</h2><p class="panel-subtitle">Export only data your role is allowed to access.</p></div><button class="button" data-action="export-report"><i data-lucide="download"></i> Export summary CSV</button></div><div class="table-wrap"><table><thead><tr><th>Report</th><th>Includes</th><th>Access</th><th>Format</th><th>Action</th></tr></thead><tbody><tr><td class="cell-primary">Transaction summary</td><td>Counts, status, totals</td><td>Finance / Admin</td><td>CSV</td><td><button class="button button-small" data-action="export-report">Export demo</button></td></tr><tr><td class="cell-primary">Provider performance</td><td>Latency, errors, success rate</td><td>Operations / Admin</td><td>CSV</td><td><button class="button button-small" data-action="export-report">Export demo</button></td></tr><tr><td class="cell-primary">User growth</td><td>Registrations and activity</td><td>Admin / authorized staff</td><td>CSV</td><td><button class="button button-small" data-action="export-report">Export demo</button></td></tr></tbody></table></div></div>
+
+        <!-- REAL STATS GRID -->
+        <div class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Gross transaction value</span><span class="stat-icon"><i data-lucide="banknote"></i></span></div>
+            <div class="stat-value" id="statGtv">...</div>
+            <div class="stat-foot">Successful volume in period</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Estimated gross profit</span><span class="stat-icon"><i data-lucide="trending-up"></i></span></div>
+            <div class="stat-value" id="statProfit">...</div>
+            <div class="stat-foot">Based on 10% average margin</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Order success rate</span><span class="stat-icon"><i data-lucide="check-circle"></i></span></div>
+            <div class="stat-value" id="statSuccess">...</div>
+            <div class="stat-foot">Successful vs total orders</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Active users</span><span class="stat-icon"><i data-lucide="users"></i></span></div>
+            <div class="stat-value" id="statUsers">...</div>
+            <div class="stat-foot">Total active accounts</div>
+          </article>
+        </div>
+
+        <div class="content-grid">
+          <!-- SERVICE PERFORMANCE BAR CHART -->
+          <section class="panel">
+            <div class="panel-header">
+              <div><h2 class="panel-title">Service performance</h2><p class="panel-subtitle">Share of processed orders in the selected period</p></div>
+            </div>
+            <div class="bar-list" id="servicePerformanceList">
+              <p style="color: #64748b; font-size: 14px;">Loading performance data...</p>
+            </div>
+          </section>
+
+          <!-- FILTERS -->
+          <section class="panel">
+            <div class="panel-header">
+              <div><h2 class="panel-title">Report filters</h2><p class="panel-subtitle">Choose a reporting window.</p></div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="report-period">Reporting period</label>
+              <select class="select-control" id="report-period" onchange="loadAllData()">
+                <option value="7d">Last 7 days</option>
+                <option value="30d" selected>Last 30 days</option>
+                <option value="this_month">This month</option>
+                <option value="last_month">Last month</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field-label" for="report-service">Service (Coming Soon)</label>
+              <select class="select-control" id="report-service" disabled>
+                <option>All services</option>
+              </select>
+            </div>
+          </section>
+        </div>
+
+        <!-- EXPORT TABLE -->
+        <div class="table-panel">
+          <div class="table-toolbar">
+            <div><h2>Report exports</h2><p class="panel-subtitle">Export live data based on the selected period.</p></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Report</th><th>Includes</th><th>Access</th><th>Format</th><th>Action</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="cell-primary">Transaction summary</td>
+                  <td>Counts, status, totals, reference</td>
+                  <td>Finance / Admin</td>
+                  <td>CSV</td>
+                  <td><button class="button button-small" onclick="exportCSV('transactions')">Export CSV</button></td>
+                </tr>
+                <tr>
+                  <td class="cell-primary">User growth</td>
+                  <td>Registrations, wallet balances</td>
+                  <td>Admin / authorized staff</td>
+                  <td>CSV</td>
+                  <td><button class="button button-small" onclick="exportCSV('users')">Export CSV</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </main>
     </div>
   </div>
-  <div class="toast-region" aria-live="polite" aria-atomic="true"></div>
-  <div class="modal-backdrop" id="admin-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal"><div class="modal-header"><h2 id="modal-title">Details</h2><button class="icon-button" type="button" data-close-modal aria-label="Close dialog"><i data-lucide="x"></i></button></div><div class="modal-body" id="modal-body"></div><div class="modal-footer"><button class="button" type="button" data-close-modal>Close</button><button class="button button-primary" type="button" data-action="modal-confirm">Confirm demo action</button></div></div>
-  </div>
-  <script src="../assets/js/admin.js"></script>
+  
+  <script>
+    const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000/api" 
+      : "https://numbahub-backend.onrender.com/api";
+
+    async function adminFetch(endpoint) {
+      const token = localStorage.getItem("adminToken");
+      if (!token) { window.location.href = "login.html"; return; }
+      const res = await fetch(`${API_URL}${endpoint}`, { headers: { "Authorization": `Bearer ${token}` } });
+      if (res.status === 401 || res.status === 403) { localStorage.removeItem("adminToken"); window.location.href = "login.html"; return; }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Request failed");
+      return data;
+    }
+
+    async function loadSidebar() {
+      const host = document.getElementById("sidebar-host");
+      if (!host) return;
+      const isSubPage = window.location.pathname.includes('/pages/');
+      const rootPath = isSubPage ? '../' : './';
+      try {
+        const res = await fetch(`${rootPath}components/sidebar.html`);
+        let html = await res.text();
+        html = html.replace(/__ROOT__/g, rootPath);
+        host.innerHTML = html;
+        
+        const adminUser = JSON.parse(localStorage.getItem("adminUser") || "{}");
+        if (adminUser.firstName) {
+          document.getElementById("sidebarAdminName").textContent = `${adminUser.firstName} ${adminUser.lastName || ''}`.trim();
+          document.getElementById("sidebarAdminEmail").textContent = adminUser.email;
+        }
+
+        const currentPage = document.body.dataset.page || 'dashboard';
+        const activeLink = host.querySelector(`a[data-nav="${currentPage}"]`);
+        if (activeLink) { activeLink.style.background = 'var(--brand)'; activeLink.style.color = '#fff'; }
+        if (window.lucide) lucide.createIcons();
+        
+        const sidebarLogoutBtn = host.querySelector('[data-action="logout"]');
+        if (sidebarLogoutBtn) sidebarLogoutBtn.addEventListener('click', logoutAdmin);
+        
+        const menuBtn = document.querySelector('[data-open-sidebar]');
+        const overlay = document.querySelector('[data-close-sidebar]');
+        const sidebar = document.getElementById('admin-sidebar');
+        if (menuBtn && overlay && sidebar) {
+          menuBtn.addEventListener('click', () => { sidebar.classList.add('open'); overlay.classList.add('active'); });
+          overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); });
+        }
+      } catch (err) { console.error("Sidebar error:", err); }
+    }
+
+    function logoutAdmin() {
+      localStorage.removeItem("adminToken");
+      window.location.href = "login.html";
+    }
+
+    // 🟢 FETCH STATS
+    async function loadStats() {
+      const period = document.getElementById("report-period").value;
+      try {
+        const stats = await adminFetch(`/admin/reports/stats?period=${period}`);
+        document.getElementById("statGtv").textContent = `₦${stats.gtv.toLocaleString()}`;
+        document.getElementById("statProfit").textContent = `₦${Math.round(stats.estimatedProfit).toLocaleString()}`;
+        document.getElementById("statSuccess").textContent = `${stats.successRate}%`;
+        document.getElementById("statUsers").textContent = stats.activeUsers.toLocaleString();
+      } catch (err) { console.error("Stats error:", err); }
+    }
+
+    // 🟢 FETCH SERVICE PERFORMANCE
+    async function loadPerformance() {
+      const period = document.getElementById("report-period").value;
+      const list = document.getElementById("servicePerformanceList");
+      list.innerHTML = `<p style="color: #64748b; font-size: 14px;">Loading...</p>`;
+
+      try {
+        const data = await adminFetch(`/admin/reports/service-performance?period=${period}`);
+        
+        if (data.length === 0) {
+          list.innerHTML = `<p style="color: #64748b; font-size: 14px;">No transactions found for this period.</p>`;
+          return;
+        }
+
+        list.innerHTML = data.map(item => `
+          <div class="bar-row">
+            <span>${item.service}</span>
+            <div class="bar-track"><div class="bar-fill" style="width: ${item.percentage}%"></div></div>
+            <strong>${item.count}</strong>
+          </div>
+        `).join('');
+      } catch (err) { 
+        console.error("Performance error:", err);
+        list.innerHTML = `<p style="color: red; font-size: 14px;">Failed to load performance data.</p>`;
+      }
+    }
+
+    // 🟢 EXPORT CSV FUNCTIONALITY
+    async function exportCSV(type) {
+      const period = document.getElementById("report-period").value;
+      try {
+        // Visual feedback
+        const btns = document.querySelectorAll(`button[onclick="exportCSV('${type}')"]`);
+        btns.forEach(b => { b.disabled = true; b.textContent = "Exporting..."; });
+
+        const data = await adminFetch(`/admin/reports/export?type=${type}&period=${period}`);
+        
+        if (data.length === 0) {
+          alert("No data available for the selected period.");
+          return;
+        }
+
+        // Convert JSON to CSV
+        const headers = Object.keys(data[0]);
+        const csvRows = [];
+        
+        // Add Header Row
+        csvRows.push(headers.join(','));
+        
+        // Add Data Rows
+        for (const row of data) {
+          const values = headers.map(header => {
+            const escaped = ('' + row[header]).replace(/"/g, '\\"');
+            return `"${escaped}"`;
+          });
+          csvRows.push(values.join(','));
+        }
+        
+        const csvString = csvRows.join('\n');
+        const blob = new Blob([csvString], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.setAttribute('hidden', '');
+        a.setAttribute('href', url);
+        a.setAttribute('download', `numbahub_${type}_${period}_${Date.now()}.csv`);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+      } catch (err) {
+        alert(err.message || "Failed to export data");
+      } finally {
+        const btns = document.querySelectorAll(`button[onclick="exportCSV('${type}')"]`);
+        btns.forEach(b => { b.disabled = false; b.textContent = "Export CSV"; });
+      }
+    }
+
+    function loadAllData() {
+      loadStats();
+      loadPerformance();
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (window.lucide) lucide.createIcons();
+      await loadSidebar();
+      loadAllData();
+    });
+  </script>
 </body>
 </html>

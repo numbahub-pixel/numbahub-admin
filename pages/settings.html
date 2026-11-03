@@ -4,15 +4,95 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#3179df">
-  <title>System Settings | NumbaHub Admin</title>
+  <title>Settings | NumbaHub Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="../assets/css/admin.css">
+  <style>
+    /* Premium Settings Layout */
+    .settings-container {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .settings-nav {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 4px 20px -5px rgba(0,0,0,0.03);
+      position: sticky;
+      top: 100px;
+    }
+
+    .settings-tab {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 4px;
+    }
+
+    .settings-tab:hover { background: #f8fafc; color: var(--text); }
+    .settings-tab.active { background: #eff6ff; color: var(--brand); }
+    .settings-tab svg { width: 18px; height: 18px; }
+
+    .settings-content {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 4px 20px -5px rgba(0,0,0,0.03);
+      min-height: 500px;
+    }
+
+    /* Toggle Switch */
+    .toggle-switch { position: relative; display: inline-block; width: 46px; height: 24px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--brand); }
+    input:checked + .slider.danger { background-color: #ef4444; }
+    input:checked + .slider.success { background-color: #10b981; }
+    input:checked + .slider:before { transform: translateX(22px); }
+
+    /* Setting Row */
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-info h4 { margin: 0 0 4px; font-size: 15px; font-weight: 600; color: var(--text); }
+    .setting-info p { margin: 0; font-size: 13px; color: #64748b; max-width: 500px; line-height: 1.5; }
+
+    /* API Monitor */
+    .api-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px; }
+    .api-card { display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: #f8fafc; }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+    .status-dot.active { background: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
+    .status-dot.inactive { background: #ef4444; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2); }
+  </style>
 </head>
 <body data-page="settings">
   <div class="app-shell">
     <div id="sidebar-host"></div>
     <div class="mobile-overlay" data-close-sidebar></div>
+    
     <div class="main-area">
       <header class="topbar">
         <div class="topbar-left">
@@ -20,27 +100,286 @@
           <span class="topbar-title">System Settings</span>
         </div>
         <div class="topbar-actions">
-          <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
-          <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
-          <button class="profile-button" type="button" data-action="profile-menu"><span class="avatar">EA</span><span class="profile-copy"><strong>Elleks Admin</strong><small>Super Admin · Demo</small></span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#8b95a7"></i></button>
+          <button class="button button-primary" onclick="saveAllSettings()" id="saveBtn" style="margin-right: 16px;"><i data-lucide="save"></i> Save Changes</button>
+          <button class="profile-button" type="button" onclick="logoutAdmin()"><span class="avatar">AD</span><span class="profile-copy"><strong>Admin Console</strong><small>Click to logout</small></span><i data-lucide="log-out" style="width:14px;height:14px;color:#8b95a7"></i></button>
         </div>
       </header>
+      
       <main class="page-content">
         <div class="page-heading">
-          <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>System Settings</h1><p>Manage platform preferences and system configuration.</p></div>
-          <div class="heading-actions"><button class="button" type="button" data-action="refresh-page"><i data-lucide="refresh-cw"></i> Refresh</button><button class="button" type="button" data-action="help"><i data-lucide="circle-help"></i> Help</button></div>
+          <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>Settings</h1><p>Manage global configurations, limits, and API integrations.</p></div>
         </div>
-        <div class="demo-banner"><span class="status pending">Demo mode</span> <span style="font-size:11px;color:#8b6a35;margin-left:7px">Sample content only · no live backend actions are performed.</span></div>
-        <div class="alert-box"><i data-lucide="info"></i><div><strong>Settings preview</strong>Saving forms in this frontend displays a demo confirmation only. Production settings must be validated and persisted by the backend.</div></div><div class="content-grid"><section class="panel"><div class="panel-header"><div><h2 class="panel-title">General settings</h2><p class="panel-subtitle">Basic platform preferences.</p></div></div><form data-demo-form="general-settings"><div class="field"><label class="field-label" for="platform-name">Platform name</label><input class="input-control" id="platform-name" value="NumbaHub" required></div><div class="field"><label class="field-label" for="support-email">Support email</label><input class="input-control" id="support-email" type="email" placeholder="support@example.com"></div><div class="field"><label class="field-label" for="default-currency">Default currency</label><select class="select-control" id="default-currency"><option value="NGN">NGN — Nigerian Naira</option><option value="USD">USD — US Dollar</option></select></div><div class="field"><label class="field-label" for="timezone">Timezone</label><select class="select-control" id="timezone"><option>Africa/Lagos (WAT)</option><option>UTC</option></select></div><div class="form-actions"><button class="button button-primary" type="submit">Save demo settings</button></div></form></section>
-<section class="panel"><div class="panel-header"><div><h2 class="panel-title">Platform availability</h2><p class="panel-subtitle">Controls require server-side implementation.</p></div></div><div class="activity-list"><div class="activity-item"><span class="activity-icon"><i data-lucide="wrench"></i></span><div class="activity-copy"><strong>Maintenance mode</strong><p>Show a maintenance page to customers.</p></div><input class="toggle" type="checkbox" data-demo-toggle="Maintenance mode" aria-label="Maintenance mode"></div><div class="activity-item"><span class="activity-icon"><i data-lucide="mail"></i></span><div class="activity-copy"><strong>Email notifications</strong><p>Requires a configured email provider.</p></div><input class="toggle" type="checkbox" data-demo-toggle="Email notifications" aria-label="Email notifications" checked></div><div class="activity-item"><span class="activity-icon"><i data-lucide="bell"></i></span><div class="activity-copy"><strong>Push notifications</strong><p>Requires configured push delivery.</p></div><input class="toggle" type="checkbox" data-demo-toggle="Push notifications" aria-label="Push notifications"></div></div></section></div>
-<div class="content-grid"><section class="panel"><div class="panel-header"><div><h2 class="panel-title">Session and access policy</h2><p class="panel-subtitle">Recommended settings to configure on the server.</p></div></div><div class="field"><label class="field-label" for="session-timeout">Session idle timeout</label><select class="select-control" id="session-timeout"><option>15 minutes</option><option selected>30 minutes</option><option>60 minutes</option></select></div><div class="field"><label class="field-label" for="mfa-policy">Multi-factor authentication</label><select class="select-control" id="mfa-policy"><option>Required for all admins</option><option>Required for privileged roles</option><option>Optional (not recommended)</option></select></div><button class="button" data-action="save-policy">Save demo policy</button></section><section class="panel"><div class="panel-header"><div><h2 class="panel-title">System health</h2><p class="panel-subtitle">Live health checks will be wired to backend monitoring.</p></div><span class="status pending">Not connected</span></div><div class="activity-list"><div class="activity-item"><span class="activity-icon"><i data-lucide="database"></i></span><div class="activity-copy"><strong>Database</strong><p>Connection status unavailable in frontend preview.</p></div></div><div class="activity-item"><span class="activity-icon"><i data-lucide="server"></i></span><div class="activity-copy"><strong>Backend API</strong><p>No API base URL configured.</p></div></div><div class="activity-item"><span class="activity-icon"><i data-lucide="workflow"></i></span><div class="activity-copy"><strong>Background jobs</strong><p>Worker status unavailable.</p></div></div></div></section></div>
+
+        <div class="settings-container">
+          
+          <!-- LEFT NAVIGATION -->
+          <div class="settings-nav">
+            <button class="settings-tab active" onclick="switchTab('general', this)"><i data-lucide="layout"></i> General</button>
+            <button class="settings-tab" onclick="switchTab('financial', this)"><i data-lucide="wallet"></i> Financial</button>
+            <button class="settings-tab" onclick="switchTab('security', this)"><i data-lucide="shield"></i> Security & Access</button>
+            <button class="settings-tab" onclick="switchTab('integrations', this)"><i data-lucide="plug"></i> API Integrations</button>
+          </div>
+
+          <!-- RIGHT CONTENT -->
+          <div class="settings-content">
+            
+            <!-- 🟢 GENERAL TAB -->
+            <div id="tab-general">
+              <h2 style="margin: 0 0 24px; font-size: 18px; font-weight: 700;">General Branding</h2>
+              <div class="field">
+                <label class="field-label">Platform Name</label>
+                <input class="input-control" id="platformName" type="text" placeholder="NumbaHub">
+              </div>
+              <div class="field">
+                <label class="field-label">Support Email</label>
+                <input class="input-control" id="supportEmail" type="email" placeholder="support@numbahub.com">
+              </div>
+              <div class="field">
+                <label class="field-label">Support Phone</label>
+                <input class="input-control" id="supportPhone" type="text" placeholder="+234...">
+              </div>
+            </div>
+
+            <!-- 🟢 FINANCIAL TAB -->
+            <div id="tab-financial" style="display: none;">
+              <h2 style="margin: 0 0 24px; font-size: 18px; font-weight: 700;">Financial Limits & Rates</h2>
+              
+              <div class="field">
+                <label class="field-label">Minimum Deposit Amount (₦)</label>
+                <input class="input-control" id="minDeposit" type="number" placeholder="1000">
+                <span style="font-size: 12px; color: #64748b; margin-top: 4px; display: block;">The lowest amount a user can fund their wallet.</span>
+              </div>
+              
+              <div class="field">
+                <label class="field-label">Maximum Deposit Amount (₦)</label>
+                <input class="input-control" id="maxDeposit" type="number" placeholder="500000">
+              </div>
+
+              <div class="field">
+                <label class="field-label">Manual Exchange Rate (USD to NGN)</label>
+                <input class="input-control" id="manualExchangeRate" type="number" placeholder="e.g. 1500">
+                <span style="font-size: 12px; color: #ef4444; margin-top: 4px; display: block;">Leave blank to use the live API. Enter a number to override.</span>
+              </div>
+            </div>
+
+            <!-- 🟢 SECURITY TAB -->
+            <div id="tab-security" style="display: none;">
+              <h2 style="margin: 0 0 24px; font-size: 18px; font-weight: 700;">Security & Access</h2>
+              
+              <div class="setting-row">
+                <div class="setting-info">
+                  <h4>Maintenance Mode</h4>
+                  <p>Lock the entire user frontend. Admins can still log in. Use this only for critical updates.</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="maintenanceMode">
+                  <span class="slider danger"></span>
+                </label>
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-info">
+                  <h4>New Registrations</h4>
+                  <p>Allow new customers to create accounts on the platform.</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="registrationEnabled">
+                  <span class="slider success"></span>
+                </label>
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-info">
+                  <h4>Force Admin 2FA</h4>
+                  <p>Require all staff members to set up Two-Factor Authentication before logging in.</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="forceAdmin2FA">
+                  <span class="slider success"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- 🟢 INTEGRATIONS TAB -->
+            <div id="tab-integrations" style="display: none;">
+              <h2 style="margin: 0 0 8px; font-size: 18px; font-weight: 700;">API Integrations</h2>
+              <p style="color: #64748b; font-size: 14px; margin-bottom: 24px;">Live status of your environment variables. If a dot is red, add the key to your Render/Server `.env` file.</p>
+              
+              <div class="api-grid" id="apiMonitorGrid">
+                <p style="color: #64748b; font-size: 14px;">Checking API statuses...</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
       </main>
     </div>
   </div>
-  <div class="toast-region" aria-live="polite" aria-atomic="true"></div>
-  <div class="modal-backdrop" id="admin-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal"><div class="modal-header"><h2 id="modal-title">Details</h2><button class="icon-button" type="button" data-close-modal aria-label="Close dialog"><i data-lucide="x"></i></button></div><div class="modal-body" id="modal-body"></div><div class="modal-footer"><button class="button" type="button" data-close-modal>Close</button><button class="button button-primary" type="button" data-action="modal-confirm">Confirm demo action</button></div></div>
-  </div>
-  <script src="../assets/js/admin.js"></script>
+  
+  <script>
+    const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000/api" 
+      : "https://numbahub-backend.onrender.com/api";
+
+    async function adminFetch(endpoint, options = {}) {
+      const token = localStorage.getItem("adminToken");
+      if (!token) { window.location.href = "login.html"; return; }
+      const res = await fetch(`${API_URL}${endpoint}`, { 
+        ...options,
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", ...options.headers } 
+      });
+      if (res.status === 401 || res.status === 403) { localStorage.removeItem("adminToken"); window.location.href = "login.html"; return; }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Request failed");
+      return data;
+    }
+
+    async function loadSidebar() {
+      const host = document.getElementById("sidebar-host");
+      if (!host) return;
+      const isSubPage = window.location.pathname.includes('/pages/');
+      const rootPath = isSubPage ? '../' : './';
+      try {
+        const res = await fetch(`${rootPath}components/sidebar.html`);
+        let html = await res.text();
+        html = html.replace(/__ROOT__/g, rootPath);
+        host.innerHTML = html;
+        
+        const adminUser = JSON.parse(localStorage.getItem("adminUser") || "{}");
+        if (adminUser.firstName) {
+          document.getElementById("sidebarAdminName").textContent = `${adminUser.firstName} ${adminUser.lastName || ''}`.trim();
+          document.getElementById("sidebarAdminEmail").textContent = adminUser.email;
+        }
+
+        const currentPage = document.body.dataset.page || 'dashboard';
+        const activeLink = host.querySelector(`a[data-nav="${currentPage}"]`);
+        if (activeLink) { activeLink.style.background = 'var(--brand)'; activeLink.style.color = '#fff'; }
+        if (window.lucide) lucide.createIcons();
+        
+        const sidebarLogoutBtn = host.querySelector('[data-action="logout"]');
+        if (sidebarLogoutBtn) sidebarLogoutBtn.addEventListener('click', logoutAdmin);
+        
+        const menuBtn = document.querySelector('[data-open-sidebar]');
+        const overlay = document.querySelector('[data-close-sidebar]');
+        const sidebar = document.getElementById('admin-sidebar');
+        if (menuBtn && overlay && sidebar) {
+          menuBtn.addEventListener('click', () => { sidebar.classList.add('open'); overlay.classList.add('active'); });
+          overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); });
+        }
+      } catch (err) { console.error("Sidebar error:", err); }
+    }
+
+    function logoutAdmin() {
+      localStorage.removeItem("adminToken");
+      window.location.href = "login.html";
+    }
+
+    // 🟢 TAB SWITCHING
+    window.switchTab = (tab, btn) => {
+      // Update buttons
+      document.querySelectorAll(".settings-tab").forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+
+      // Update content
+      document.querySelectorAll(".settings-content > div").forEach(d => d.style.display = "none");
+      document.getElementById(`tab-${tab}`).style.display = "block";
+    };
+
+    // 🟢 LOAD SETTINGS
+    async function loadSettings() {
+      try {
+        const data = await adminFetch("/admin/settings");
+        
+        // General
+        document.getElementById("platformName").value = data.settings.platformName || "NumbaHub";
+        document.getElementById("supportEmail").value = data.settings.supportEmail || "";
+        document.getElementById("supportPhone").value = data.settings.supportPhone || "";
+
+        // Financial
+        document.getElementById("minDeposit").value = data.settings.minDeposit || 1000;
+        document.getElementById("maxDeposit").value = data.settings.maxDeposit || 500000;
+        document.getElementById("manualExchangeRate").value = data.settings.manualExchangeRate || "";
+
+        // Security
+        document.getElementById("maintenanceMode").checked = data.settings.maintenanceMode;
+        document.getElementById("registrationEnabled").checked = data.settings.registrationEnabled;
+        document.getElementById("forceAdmin2FA").checked = data.settings.forceAdmin2FA;
+
+        // API Monitor
+        const grid = document.getElementById("apiMonitorGrid");
+        const apiLabels = {
+          kora: "Kora (Payments)",
+          fivesim: "5sim (Numbers)",
+          billpoint: "Billpoint (Giftcards)",
+          esimGo: "eSIM Go (Data)",
+          smmAfrica: "SMM Africa (Engagement)",
+          mongo: "MongoDB (Database)"
+        };
+
+        grid.innerHTML = Object.keys(apiLabels).map(key => {
+          const isActive = data.apiStatus[key];
+          return `
+            <div class="api-card">
+              <div>
+                <strong style="display: block; font-size: 13px; color: #1e293b; margin-bottom: 4px;">${apiLabels[key]}</strong>
+                <span style="font-size: 12px; color: ${isActive ? '#10b981' : '#ef4444'}; font-weight: 600;">
+                  ${isActive ? 'Connected' : 'Missing API Key'}
+                </span>
+              </div>
+              <div class="status-dot ${isActive ? 'active' : 'inactive'}"></div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error("Failed to load settings:", err);
+        alert("Failed to load system settings.");
+      }
+    }
+
+    // 🟢 SAVE SETTINGS
+    async function saveAllSettings() {
+      const btn = document.getElementById("saveBtn");
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="loader" class="animate-spin"></i> Saving...`;
+      btn.disabled = true;
+      if (window.lucide) lucide.createIcons();
+
+      const payload = {
+        platformName: document.getElementById("platformName").value.trim(),
+        supportEmail: document.getElementById("supportEmail").value.trim(),
+        supportPhone: document.getElementById("supportPhone").value.trim(),
+        
+        minDeposit: Number(document.getElementById("minDeposit").value),
+        maxDeposit: Number(document.getElementById("maxDeposit").value),
+        manualExchangeRate: document.getElementById("manualExchangeRate").value.trim(),
+        
+        maintenanceMode: document.getElementById("maintenanceMode").checked,
+        registrationEnabled: document.getElementById("registrationEnabled").checked,
+        forceAdmin2FA: document.getElementById("forceAdmin2FA").checked,
+      };
+
+      try {
+        await adminFetch("/admin/settings", {
+          method: "PUT",
+          body: JSON.stringify(payload)
+        });
+        
+        alert("System settings saved successfully! Some changes may require a backend restart to take effect.");
+      } catch (err) {
+        alert(err.message || "Failed to save settings");
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (window.lucide) lucide.createIcons();
+      await loadSidebar();
+      loadSettings();
+    });
+  </script>
 </body>
 </html>

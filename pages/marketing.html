@@ -13,6 +13,7 @@
   <div class="app-shell">
     <div id="sidebar-host"></div>
     <div class="mobile-overlay" data-close-sidebar></div>
+    
     <div class="main-area">
       <header class="topbar">
         <div class="topbar-left">
@@ -22,25 +23,331 @@
         <div class="topbar-actions">
           <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
           <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
-          <button class="profile-button" type="button" data-action="profile-menu"><span class="avatar">EA</span><span class="profile-copy"><strong>Elleks Admin</strong><small>Super Admin · Demo</small></span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#8b95a7"></i></button>
+          <button class="profile-button" type="button" onclick="logoutAdmin()"><span class="avatar">AD</span><span class="profile-copy"><strong>Admin Console</strong><small>Click to logout</small></span><i data-lucide="log-out" style="width:14px;height:14px;color:#8b95a7"></i></button>
         </div>
       </header>
+      
       <main class="page-content">
         <div class="page-heading">
           <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>Marketing & Notifications</h1><p>Manage announcements, campaigns and referral settings.</p></div>
-          <div class="heading-actions"><button class="button" type="button" data-action="refresh-page"><i data-lucide="refresh-cw"></i> Refresh</button><button class="button" type="button" data-action="help"><i data-lucide="circle-help"></i> Help</button></div>
+          <div class="heading-actions">
+            <button class="button" type="button" onclick="loadData()"><i data-lucide="refresh-cw"></i> Refresh</button>
+          </div>
         </div>
-        <div class="demo-banner"><span class="status pending">Demo mode</span> <span style="font-size:11px;color:#8b6a35;margin-left:7px">Sample content only · no live backend actions are performed.</span></div>
-        <div class="alert-box"><i data-lucide="info"></i><div><strong>Campaign delivery</strong>This page manages demo campaign records. Sending real emails, push notifications or SMS requires configured providers and backend endpoints.</div></div><div class="stats-grid"><article class="stat-card"><div class="stat-top"><span class="stat-label">Campaigns</span><span class="stat-icon"><i data-lucide="megaphone"></i></span></div><div class="stat-value">6</div><div class="stat-foot">Sample records</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Audience</span><span class="stat-icon"><i data-lucide="users"></i></span></div><div class="stat-value">8,420</div><div class="stat-foot">Illustrative audience</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Referral conversions</span><span class="stat-icon"><i data-lucide="git-branch"></i></span></div><div class="stat-value">324</div><div class="stat-foot">Sample count</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Scheduled notices</span><span class="stat-icon"><i data-lucide="calendar-clock"></i></span></div><div class="stat-value">2</div><div class="stat-foot">Sample count</div></article></div>
-<div class="content-grid"><section class="panel"><div class="panel-header"><div><h2 class="panel-title">Create announcement</h2><p class="panel-subtitle">Draft an in-app notice or promotional banner.</p></div></div><form data-demo-form="announcement-form" id="announcement-form"><div class="field"><label class="field-label" for="announcement-title">Announcement title</label><input class="input-control" id="announcement-title" required placeholder="e.g. Scheduled maintenance"></div><div class="field"><label class="field-label" for="announcement-channel">Channel</label><select class="select-control" id="announcement-channel"><option>In-app announcement</option><option>Dashboard banner</option><option>Email (requires integration)</option><option>Push notification (requires integration)</option></select></div><div class="field"><label class="field-label" for="announcement-message">Message</label><textarea class="textarea-control" id="announcement-message" required placeholder="Write a clear message for customers..."></textarea></div><label class="check-row"><input type="checkbox" id="announcement-draft" checked> Save as draft (recommended)</label><div class="form-actions"><button type="reset" class="button">Clear</button><button class="button button-primary" type="submit">Save announcement</button></div></form></section><section class="panel"><div class="panel-header"><div><h2 class="panel-title">Referral settings</h2><p class="panel-subtitle">Example settings, not persisted to the backend.</p></div></div><form data-demo-form="referral-form"><div class="field"><label class="field-label" for="referral-reward">Reward per qualified referral (₦)</label><input class="input-control" id="referral-reward" type="number" min="0" value="500"></div><div class="field"><label class="field-label" for="referral-min">Minimum qualifying spend (₦)</label><input class="input-control" id="referral-min" type="number" min="0" value="2000"></div><div class="field"><label class="field-label" for="referral-status">Campaign status</label><select class="select-control" id="referral-status"><option>Draft</option><option>Active</option><option>Paused</option></select></div><button class="button button-primary" type="submit">Save demo settings</button></form></section></div>
-<div class="table-panel"><div class="table-toolbar"><div><h2>Campaign history</h2><p class="panel-subtitle">Illustrative campaigns and delivery statuses.</p></div><button class="button" data-action="export-table" data-table="campaign-table"><i data-lucide="download"></i> Export</button></div><div class="table-wrap"><table id="campaign-table"><thead><tr><th>Campaign</th><th>Channel</th><th>Audience</th><th>Created</th><th>Status</th><th>Action</th></tr></thead><tbody><tr data-searchable><td class="cell-primary">Service update</td><td>In-app</td><td>All active users</td><td>Oct 17, 2026</td><td><span class="status">Published (demo)</span></td><td><button class="button button-small" data-action="view-record" data-record="Service update">View</button></td></tr><tr data-searchable><td class="cell-primary">New eSIM offers</td><td>Dashboard banner</td><td>Eligible users</td><td>Oct 16, 2026</td><td><span class="status pending">Draft</span></td><td><button class="button button-small" data-action="view-record" data-record="New eSIM offers">Edit</button></td></tr></tbody></table></div></div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Campaigns</span><span class="stat-icon"><i data-lucide="megaphone"></i></span></div>
+            <div class="stat-value" id="statCampaigns">...</div>
+            <div class="stat-foot">Live records</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Audience</span><span class="stat-icon"><i data-lucide="users"></i></span></div>
+            <div class="stat-value" id="statAudience">...</div>
+            <div class="stat-foot">Total registered users</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Referral conversions</span><span class="stat-icon"><i data-lucide="git-branch"></i></span></div>
+            <div class="stat-value" id="statReferrals">...</div>
+            <div class="stat-foot">Users referred by others</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Scheduled notices</span><span class="stat-icon"><i data-lucide="calendar-clock"></i></span></div>
+            <div class="stat-value" id="statScheduled">...</div>
+            <div class="stat-foot">Pending delivery</div>
+          </article>
+        </div>
+
+        <div class="content-grid">
+          <!-- ANNOUNCEMENT FORM -->
+          <section class="panel">
+            <div class="panel-header"><div><h2 class="panel-title">Create announcement</h2><p class="panel-subtitle">Draft an in-app notice or promotional banner.</p></div></div>
+            <form id="announcementForm">
+              <div class="field">
+                <label class="field-label" for="announcement-title">Announcement title</label>
+                <input class="input-control" id="announcement-title" required placeholder="e.g. Scheduled maintenance">
+              </div>
+              <div class="field">
+                <label class="field-label" for="announcement-channel">Channel</label>
+                <select class="select-control" id="announcement-channel">
+                  <option>In-app announcement</option>
+                  <option>Dashboard banner</option>
+                  <option>Email</option>
+                  <option>Push notification</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label" for="announcement-message">Message</label>
+                <textarea class="textarea-control" id="announcement-message" required placeholder="Write a clear message for customers..." rows="4"></textarea>
+              </div>
+              <label class="check-row">
+                <input type="checkbox" id="announcement-draft" checked> Save as draft (recommended)
+              </label>
+              <div class="form-actions">
+                <button type="button" class="button" onclick="document.getElementById('announcementForm').reset()">Clear</button>
+                <button class="button button-primary" type="submit" id="saveCampaignBtn">Save announcement</button>
+              </div>
+            </form>
+          </section>
+
+          <!-- REFERRAL SETTINGS FORM -->
+          <section class="panel">
+            <div class="panel-header"><div><h2 class="panel-title">Referral settings</h2><p class="panel-subtitle">These values apply globally to all users.</p></div></div>
+            <form id="referralForm">
+              <div class="field">
+                <label class="field-label" for="referral-reward">Reward per qualified referral (₦)</label>
+                <input class="input-control" id="referral-reward" type="number" min="0" required>
+              </div>
+              <div class="field">
+                <label class="field-label" for="referral-min">Minimum qualifying spend (₦)</label>
+                <input class="input-control" id="referral-min" type="number" min="0" required>
+              </div>
+              <div class="field">
+                <label class="field-label" for="referral-status">Campaign status</label>
+                <select class="select-control" id="referral-status">
+                  <option>Draft</option>
+                  <option>Active</option>
+                  <option>Paused</option>
+                </select>
+              </div>
+              <button class="button button-primary" type="submit" id="saveReferralBtn">Save settings</button>
+            </form>
+          </section>
+        </div>
+
+        <!-- CAMPAIGN HISTORY TABLE -->
+        <div class="table-panel">
+          <div class="table-toolbar">
+            <div><h2>Campaign history</h2><p class="panel-subtitle">Live record of all announcements.</p></div>
+          </div>
+          <div class="table-wrap">
+            <table id="campaign-table">
+              <thead>
+                <tr><th>Campaign</th><th>Channel</th><th>Audience</th><th>Created</th><th>Status</th></tr>
+              </thead>
+              <tbody id="campaignTableBody">
+                <tr><td colspan="5" style="text-align: center;">Loading campaigns...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <span id="tableInfo">Showing 0 campaigns</span>
+            <div class="pagination" id="paginationControls"></div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
-  <div class="toast-region" aria-live="polite" aria-atomic="true"></div>
-  <div class="modal-backdrop" id="admin-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal"><div class="modal-header"><h2 id="modal-title">Details</h2><button class="icon-button" type="button" data-close-modal aria-label="Close dialog"><i data-lucide="x"></i></button></div><div class="modal-body" id="modal-body"></div><div class="modal-footer"><button class="button" type="button" data-close-modal>Close</button><button class="button button-primary" type="button" data-action="modal-confirm">Confirm demo action</button></div></div>
-  </div>
-  <script src="../assets/js/admin.js"></script>
+  
+  <script>
+    const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000/api" 
+      : "https://numbahub-backend.onrender.com/api";
+
+    let currentPage = 1;
+
+    async function adminFetch(endpoint, options = {}) {
+      const token = localStorage.getItem("adminToken");
+      if (!token) { window.location.href = "login.html"; return; }
+      const res = await fetch(`${API_URL}${endpoint}`, { 
+        ...options,
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", ...options.headers } 
+      });
+      if (res.status === 401 || res.status === 403) { localStorage.removeItem("adminToken"); window.location.href = "login.html"; return; }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Request failed");
+      return data;
+    }
+
+    async function loadSidebar() {
+      const host = document.getElementById("sidebar-host");
+      if (!host) return;
+      const isSubPage = window.location.pathname.includes('/pages/');
+      const rootPath = isSubPage ? '../' : './';
+      try {
+        const res = await fetch(`${rootPath}components/sidebar.html`);
+        let html = await res.text();
+        html = html.replace(/__ROOT__/g, rootPath);
+        host.innerHTML = html;
+        
+        const adminUser = JSON.parse(localStorage.getItem("adminUser") || "{}");
+        if (adminUser.firstName) {
+          document.getElementById("sidebarAdminName").textContent = `${adminUser.firstName} ${adminUser.lastName || ''}`.trim();
+          document.getElementById("sidebarAdminEmail").textContent = adminUser.email;
+        }
+
+        const currentPage = document.body.dataset.page || 'dashboard';
+        const activeLink = host.querySelector(`a[data-nav="${currentPage}"]`);
+        if (activeLink) { activeLink.style.background = 'var(--brand)'; activeLink.style.color = '#fff'; }
+        if (window.lucide) lucide.createIcons();
+        
+        const sidebarLogoutBtn = host.querySelector('[data-action="logout"]');
+        if (sidebarLogoutBtn) sidebarLogoutBtn.addEventListener('click', logoutAdmin);
+        
+        const menuBtn = document.querySelector('[data-open-sidebar]');
+        const overlay = document.querySelector('[data-close-sidebar]');
+        const sidebar = document.getElementById('admin-sidebar');
+        if (menuBtn && overlay && sidebar) {
+          menuBtn.addEventListener('click', () => { sidebar.classList.add('open'); overlay.classList.add('active'); });
+          overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); });
+        }
+      } catch (err) { console.error("Sidebar error:", err); }
+    }
+
+    function logoutAdmin() {
+      localStorage.removeItem("adminToken");
+      window.location.href = "login.html";
+    }
+
+    // 🟢 FETCH STATS
+    async function loadStats() {
+      try {
+        const stats = await adminFetch("/admin/marketing/stats");
+        document.getElementById("statCampaigns").textContent = stats.totalCampaigns.toLocaleString();
+        document.getElementById("statAudience").textContent = stats.totalUsers.toLocaleString();
+        document.getElementById("statReferrals").textContent = stats.referralConversions.toLocaleString();
+        document.getElementById("statScheduled").textContent = stats.scheduledNotices.toLocaleString();
+      } catch (err) { console.error("Stats error:", err); }
+    }
+
+    // 🟢 FETCH CAMPAIGNS
+    async function loadCampaigns() {
+      const tbody = document.getElementById("campaignTableBody");
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Loading...</td></tr>`;
+
+      try {
+        const data = await adminFetch(`/admin/marketing/campaigns?page=${currentPage}&limit=10`);
+        
+        if (data.campaigns.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No campaigns found.</td></tr>`;
+          document.getElementById("tableInfo").textContent = `Showing 0 campaigns`;
+          document.getElementById("paginationControls").innerHTML = "";
+          return;
+        }
+
+        tbody.innerHTML = data.campaigns.map(c => {
+          const date = new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          let statusClass = c.status === "Published" ? "" : c.status === "Draft" ? "pending" : "info";
+
+          return `
+            <tr>
+              <td class="cell-primary">${c.title}</td>
+              <td>${c.channel}</td>
+              <td>${c.audience}</td>
+              <td>${date}</td>
+              <td><span class="status ${statusClass}">${c.status}</span></td>
+            </tr>
+          `;
+        }).join('');
+
+        document.getElementById("tableInfo").textContent = `Showing ${data.campaigns.length} of ${data.totalCampaigns} campaigns`;
+        renderPagination(data.totalPages, data.currentPage);
+
+      } catch (err) {
+        console.error("Campaigns error:", err);
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Failed to load campaigns.</td></tr>`;
+      }
+    }
+
+    function renderPagination(totalPages, current) {
+      const container = document.getElementById("paginationControls");
+      let html = "";
+      if (totalPages > 1) {
+        html += `<button ${current === 1 ? 'disabled' : ''} onclick="changePage(${current - 1})"><i data-lucide="chevron-left"></i></button>`;
+        for (let i = 1; i <= totalPages; i++) {
+          if (i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {
+            html += `<button class="${i === current ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+          } else if (i === current - 2 || i === current + 2) {
+            html += `<span>...</span>`;
+          }
+        }
+        html += `<button ${current === totalPages ? 'disabled' : ''} onclick="changePage(${current + 1})"><i data-lucide="chevron-right"></i></button>`;
+      }
+      container.innerHTML = html;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function changePage(page) { currentPage = page; loadCampaigns(); }
+
+    // 🟢 FETCH REFERRAL SETTINGS
+    async function loadReferralSettings() {
+      try {
+        const settings = await adminFetch("/admin/marketing/referral-settings");
+        document.getElementById("referral-reward").value = settings.reward || 500;
+        document.getElementById("referral-min").value = settings.minSpend || 2000;
+        document.getElementById("referral-status").value = settings.status || "Active";
+      } catch (err) { console.error("Referral settings error:", err); }
+    }
+
+    // 🟢 SUBMIT FORMS
+    document.getElementById("announcementForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("saveCampaignBtn");
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Saving...";
+
+      const payload = {
+        title: document.getElementById("announcement-title").value.trim(),
+        channel: document.getElementById("announcement-channel").value,
+        message: document.getElementById("announcement-message").value.trim(),
+        isDraft: document.getElementById("announcement-draft").checked
+      };
+
+      try {
+        await adminFetch("/admin/marketing/campaigns", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+        alert("Announcement saved successfully!");
+        e.target.reset();
+        loadData(); // Refresh stats & table
+      } catch (err) {
+        alert(err.message || "Failed to save announcement");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    });
+
+    document.getElementById("referralForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("saveReferralBtn");
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Saving...";
+
+      const payload = {
+        reward: Number(document.getElementById("referral-reward").value),
+        minSpend: Number(document.getElementById("referral-min").value),
+        status: document.getElementById("referral-status").value
+      };
+
+      try {
+        await adminFetch("/admin/marketing/referral-settings", {
+          method: "PUT",
+          body: JSON.stringify(payload)
+        });
+        alert("Referral settings saved successfully!");
+      } catch (err) {
+        alert(err.message || "Failed to save settings");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    });
+
+    function loadData() {
+      loadStats();
+      loadCampaigns();
+      loadReferralSettings();
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (window.lucide) lucide.createIcons();
+      await loadSidebar();
+      loadData();
+    });
+  </script>
 </body>
 </html>
