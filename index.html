@@ -9,93 +9,200 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="assets/css/admin.css">
   <style>
-    /* Fallback styles for mobile overlay in case admin.css misses it */
-    .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    body { font-family: 'Inter', sans-serif; }
+    
+    .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(2px); z-index: 90; }
     .mobile-overlay.active { display: block; }
-    .sidebar { transition: transform 0.3s ease; }
+    
+    /* Ultra-Subtle Premium Card */
+    .smart-card {
+      background: #ffffff;
+      border: 1px solid #f1f5f9;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.01);
+      transition: all 0.2s ease;
+    }
+    .smart-card:hover {
+      border-color: #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
     @media (max-width: 1024px) {
       .sidebar { transform: translateX(-100%); position: fixed; z-index: 100; height: 100vh; }
       .sidebar.open { transform: translateX(0); }
     }
   </style>
 </head>
-<body data-page="dashboard">
+<body data-page="dashboard" class="bg-[#fafafa] text-slate-900">
   <div class="app-shell">
     <div id="sidebar-host"></div>
     <div class="mobile-overlay" data-close-sidebar></div>
     
-    <div class="main-area">
-      <header class="topbar">
-        <div class="topbar-left">
-          <button class="icon-button menu-button" type="button" data-open-sidebar aria-label="Open navigation"><i data-lucide="menu"></i></button>
-          <span class="topbar-title">Dashboard</span>
+    <div class="main-area min-h-screen">
+      
+      <!-- Clean, Compact Topbar -->
+      <header class="bg-white border-b border-slate-200/60 sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button class="lg:hidden text-slate-500 hover:text-slate-800" data-open-sidebar><i data-lucide="menu" class="w-5 h-5"></i></button>
+          <h1 class="text-lg font-semibold text-slate-800 tracking-tight">Dashboard</h1>
         </div>
-        <div class="topbar-actions">
-          <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page"></label>
-          <button class="icon-button" type="button"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
-          <button class="profile-button" type="button" onclick="logoutAdmin()"><span class="avatar">AD</span><span class="profile-copy"><strong>Admin Console</strong><small>Click to logout</small></span><i data-lucide="log-out" style="width:14px;height:14px;color:#8b95a7"></i></button>
+        <div class="flex items-center gap-4">
+          <button class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-500 hover:bg-slate-100 transition"><i data-lucide="bell" class="w-4 h-4"></i></button>
+          <div class="h-5 w-px bg-slate-200"></div>
+          <button onclick="logoutAdmin()" class="flex items-center gap-2 group">
+            <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold border border-blue-100">AD</div>
+            <span class="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition hidden sm:block">Logout</span>
+            <i data-lucide="log-out" class="w-4 h-4 text-slate-400 group-hover:text-red-500 transition"></i>
+          </button>
         </div>
       </header>
       
-      <main class="page-content">
-        <div class="page-heading">
+      <!-- Main Content Area (Tighter Spacing) -->
+      <main class="p-6 max-w-[1400px] mx-auto space-y-6">
+        
+        <!-- Page Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <p class="eyebrow" id="currentDate">LOADING DATE...</p>
-            <h1>Good morning, Admin 👋</h1>
-            <p>Here is what's happening across your NumbaHub platform.</p>
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1" id="currentDate">Loading...</p>
+            <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Overview</h2>
           </div>
+          <button class="text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2">
+            <i data-lucide="download" class="w-4 h-4"></i> Export Report
+          </button>
         </div>
 
-        <div class="stats-grid">
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Total users</span><span class="stat-icon"><i data-lucide="users"></i></span></div>
-            <div class="stat-value" id="statTotalUsers">...</div>
-            <div class="stat-foot"><span class="trend-up">Live</span><span>registered accounts</span></div>
-          </article>
-          
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Transaction volume</span><span class="stat-icon"><i data-lucide="arrow-left-right"></i></span></div>
-            <div class="stat-value" id="statTotalVolume">...</div>
-            <div class="stat-foot"><span class="trend-up">Live</span><span>total successful volume</span></div>
-          </article>
-          
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Estimated gross profit</span><span class="stat-icon"><i data-lucide="chart-no-axes-combined"></i></span></div>
-            <div class="stat-value" id="statProfit">...</div>
-            <div class="stat-foot"><span>Based on 10% average margin</span></div>
-          </article>
-          
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Pending attention</span><span class="stat-icon"><i data-lucide="clock-3"></i></span></div>
-            <div class="stat-value" id="statPending">...</div>
-            <div class="stat-foot"><span>orders awaiting processing</span></div>
-          </article>
-        </div>
-
-        <div class="content-grid">
-          <section class="panel">
-            <div class="panel-header"><div><h2 class="panel-title">Recent registrations</h2><p class="panel-subtitle">Latest users to join NumbaHub</p></div></div>
-            <div class="activity-list" id="recentActivityList">
-              <p style="padding: 20px; color: #64748b;">Loading activity...</p>
+        <!-- Smart Stats Grid (Tighter, smaller numbers) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Total Users</span>
+              <i data-lucide="users" class="w-4 h-4 text-blue-500"></i>
             </div>
-          </section>
+            <div class="text-2xl font-bold text-slate-900" id="statTotalUsers">...</div>
+            <div class="text-xs text-emerald-600 font-medium mt-1 flex items-center gap-1">
+              <i data-lucide="trending-up" class="w-3 h-3"></i> Live accounts
+            </div>
+          </div>
+          
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Transaction Volume</span>
+              <i data-lucide="activity" class="w-4 h-4 text-purple-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="statTotalVolume">...</div>
+            <div class="text-xs text-emerald-600 font-medium mt-1 flex items-center gap-1">
+              <i data-lucide="trending-up" class="w-3 h-3"></i> Live volume
+            </div>
+          </div>
+          
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Est. Gross Profit</span>
+              <i data-lucide="bar-chart-2" class="w-4 h-4 text-emerald-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="statProfit">...</div>
+            <div class="text-xs text-slate-400 font-medium mt-1">Based on 10% margin</div>
+          </div>
+          
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Pending Attention</span>
+              <i data-lucide="clock" class="w-4 h-4 text-orange-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="statPending">...</div>
+            <div class="text-xs text-orange-600 font-medium mt-1">Orders in queue</div>
+          </div>
         </div>
 
-        <div class="table-panel">
-          <div class="table-toolbar">
-            <div><h2>Recent transactions</h2><p class="panel-subtitle">Latest platform activity</p></div>
+        <!-- Main Grid: Chart (2 cols) + Activity (1 col) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Sleek SVG Area Chart -->
+          <div class="smart-card lg:col-span-2 p-6 flex flex-col">
+            <div class="flex justify-between items-start mb-6">
+              <div>
+                <h3 class="text-base font-bold text-slate-900">Revenue Overview</h3>
+                <p class="text-xs text-slate-500 mt-1">Transaction volume across the week</p>
+              </div>
+              <select class="text-xs font-medium bg-slate-50 border border-slate-200 text-slate-600 rounded-md px-2 py-1 outline-none">
+                <option>This Week</option>
+                <option>Last Week</option>
+              </select>
+            </div>
+            
+            <!-- Pure SVG Chart with Gradient -->
+            <div class="flex-1 w-full relative min-h-[220px]">
+              <svg viewBox="0 0 500 200" preserveAspectRatio="none" class="w-full h-full absolute inset-0">
+                <defs>
+                  <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#3179df" stop-opacity="0.15"/>
+                    <stop offset="100%" stop-color="#3179df" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <!-- Grid Lines -->
+                <line x1="0" y1="50" x2="500" y2="50" stroke="#f1f5f9" stroke-width="1"/>
+                <line x1="0" y1="100" x2="500" y2="100" stroke="#f1f5f9" stroke-width="1"/>
+                <line x1="0" y1="150" x2="500" y2="150" stroke="#f1f5f9" stroke-width="1"/>
+                
+                <!-- Area Fill -->
+                <path d="M0 180 C50 150 100 120 150 140 C200 160 250 80 300 90 C350 100 400 40 500 60 L500 200 L0 200 Z" fill="url(#areaGradient)"/>
+                
+                <!-- Smooth Line -->
+                <path d="M0 180 C50 150 100 120 150 140 C200 160 250 80 300 90 C350 100 400 40 500 60" fill="none" stroke="#3179df" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                
+                <!-- Data Point -->
+                <circle cx="300" cy="90" r="4" fill="#ffffff" stroke="#3179df" stroke-width="2"/>
+              </svg>
+            </div>
+            
+            <!-- X-Axis Labels -->
+            <div class="flex justify-between text-[11px] font-medium text-slate-400 mt-4 px-1">
+              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+            </div>
           </div>
-          <div class="table-wrap">
-            <table>
+
+          <!-- Recent Activity (Compact List) -->
+          <div class="smart-card p-6">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-base font-bold text-slate-900">Recent Users</h3>
+              <a href="pages/users.html" class="text-xs font-semibold text-blue-600 hover:text-blue-700">View all</a>
+            </div>
+            <div class="space-y-5" id="recentActivityList">
+              <p class="text-xs text-center text-slate-400 py-4">Loading...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Transactions Table (Dense & Clean) -->
+        <div class="smart-card overflow-hidden">
+          <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Recent Transactions</h3>
+              <p class="text-xs text-slate-500 mt-1">Latest platform activity</p>
+            </div>
+            <a href="pages/orders.html" class="text-xs font-semibold text-blue-600 hover:text-blue-700">View all</a>
+          </div>
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
               <thead>
-                <tr><th>Reference</th><th>Customer</th><th>Service</th><th>Amount</th><th>Status</th><th>Date</th></tr>
+                <tr class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold border-b border-slate-100 bg-slate-50/50">
+                  <th class="px-6 py-3">Reference</th>
+                  <th class="px-6 py-3">Customer</th>
+                  <th class="px-6 py-3">Service</th>
+                  <th class="px-6 py-3">Amount</th>
+                  <th class="px-6 py-3">Status</th>
+                  <th class="px-6 py-3 text-right">Date</th>
+                </tr>
               </thead>
-              <tbody id="recentTransactionsTable">
-                <tr><td colspan="6" style="text-align:center; padding: 20px;">Loading transactions...</td></tr>
+              <tbody id="recentTransactionsTable" class="text-sm text-slate-700 divide-y divide-slate-100">
+                <tr><td colspan="6" class="px-6 py-8 text-center text-slate-400">Loading...</td></tr>
               </tbody>
             </table>
           </div>
         </div>
+
       </main>
     </div>
   </div>
@@ -108,7 +215,6 @@
      async function loadSidebar() {
       const host = document.getElementById("sidebar-host");
       if (!host) return;
-
       const isSubPage = window.location.pathname.includes('/pages/');
       const rootPath = isSubPage ? '../' : './';
 
@@ -120,7 +226,6 @@
         html = html.replace(/__ROOT__/g, rootPath);
         host.innerHTML = html;
 
-        // 🟢 INJECT REAL ADMIN DATA
         const adminUser = JSON.parse(localStorage.getItem("adminUser") || "{}");
         if (adminUser.firstName) {
           const nameEl = document.getElementById("sidebarAdminName");
@@ -129,23 +234,15 @@
           if (emailEl) emailEl.textContent = adminUser.email;
         }
 
-        // Highlight active link
         const currentPage = document.body.dataset.page || 'dashboard';
         const activeLink = host.querySelector(`a[data-nav="${currentPage}"]`);
-        if (activeLink) {
-          activeLink.style.background = 'var(--brand)';
-          activeLink.style.color = '#fff';
-        }
+        if (activeLink) activeLink.classList.add('active');
 
         if (window.lucide) lucide.createIcons();
 
-        // Attach logout event
         const sidebarLogoutBtn = host.querySelector('[data-action="logout"]');
-        if (sidebarLogoutBtn) {
-          sidebarLogoutBtn.addEventListener('click', logoutAdmin);
-        }
+        if (sidebarLogoutBtn) sidebarLogoutBtn.addEventListener('click', logoutAdmin);
 
-        // Mobile toggle
         const menuBtn = document.querySelector('[data-open-sidebar]');
         const overlay = document.querySelector('[data-close-sidebar]');
         const sidebar = document.getElementById('admin-sidebar');
@@ -160,29 +257,16 @@
             overlay.classList.remove('active');
           });
         }
-
       } catch (err) {
         console.error("Failed to load sidebar:", err);
       }
     }
 
-    // 🟢 2. DATA FETCHING LOGIC
     async function adminFetch(endpoint) {
       const token = localStorage.getItem("adminToken");
-      if (!token) {
-        window.location.href = "login.html";
-        return;
-      }
-
-      const res = await fetch(`${API_URL}${endpoint}`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      
-      if (res.status === 401 || res.status === 403) {
-        localStorage.removeItem("adminToken");
-        window.location.href = "login.html";
-        return;
-      }
+      if (!token) { window.location.href = "login.html"; return; }
+      const res = await fetch(`${API_URL}${endpoint}`, { headers: { "Authorization": `Bearer ${token}` } });
+      if (res.status === 401 || res.status === 403) { localStorage.removeItem("adminToken"); window.location.href = "login.html"; return; }
       return await res.json();
     }
 
@@ -191,71 +275,72 @@
       window.location.href = "login.html";
     }
 
-    // 🟢 3. INITIALIZATION
     document.addEventListener("DOMContentLoaded", async () => {
       if (window.lucide) lucide.createIcons();
-      
-      // Load the sidebar first
       await loadSidebar();
 
-      // Set Date
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
       document.getElementById("currentDate").textContent = new Date().toLocaleDateString('en-US', options).toUpperCase();
 
-      // 1. Fetch Live Stats
+      // Stats
       try {
         const stats = await adminFetch("/admin/stats");
         document.getElementById("statTotalUsers").textContent = stats.totalUsers.toLocaleString();
         document.getElementById("statTotalVolume").textContent = `₦${stats.totalVolume.toLocaleString()}`;
         document.getElementById("statProfit").textContent = `₦${stats.estimatedProfit.toLocaleString()}`;
         document.getElementById("statPending").textContent = stats.pendingOrders;
-      } catch (err) {
-        console.error("Stats error:", err);
-      }
+      } catch (err) { console.error("Stats error:", err); }
 
-      // 2. Fetch Live Recent Transactions
+      // Transactions
       try {
         const txs = await adminFetch("/admin/recent-transactions");
         const tbody = document.getElementById("recentTransactionsTable");
         
         if (txs.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No transactions yet.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400">No transactions yet.</td></tr>`;
         } else {
-          tbody.innerHTML = txs.map(tx => `
-            <tr>
-              <td class="cell-primary">${tx.reference.substring(0, 15)}...</td>
-              <td>${tx.user ? `${tx.user.firstName} ${tx.user.lastName}` : 'Unknown'}</td>
-              <td style="text-transform: capitalize;">${tx.service.replace('_', ' ')}</td>
-              <td>₦${tx.amount.toLocaleString()}</td>
-              <td><span class="status ${tx.status === 'successful' ? '' : tx.status}">${tx.status}</span></td>
-              <td>${new Date(tx.createdAt).toLocaleDateString()}</td>
+          tbody.innerHTML = txs.map(tx => {
+            const isSuccess = tx.status === 'successful';
+            const isPending = tx.status === 'pending';
+            const statusColor = isSuccess ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : isPending ? 'bg-orange-50 text-orange-700 border-orange-100' : 'bg-red-50 text-red-700 border-red-100';
+            
+            return `
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900">${tx.reference.substring(0, 12)}...</td>
+              <td class="px-6 py-4">${tx.user ? `${tx.user.firstName} ${tx.user.lastName}` : 'Unknown'}</td>
+              <td class="px-6 py-4 text-slate-500 capitalize">${tx.service.replace('_', ' ')}</td>
+              <td class="px-6 py-4 font-semibold text-slate-900">₦${tx.amount.toLocaleString()}</td>
+              <td class="px-6 py-4"><span class="px-2 py-1 rounded-md text-[11px] font-bold border ${statusColor} capitalize">${tx.status}</span></td>
+              <td class="px-6 py-4 text-right text-slate-400 text-xs font-medium">${new Date(tx.createdAt).toLocaleDateString()}</td>
             </tr>
-          `).join('');
+          `}).join('');
         }
-      } catch (err) {
-        console.error("Tx error:", err);
-      }
+      } catch (err) { console.error("Tx error:", err); }
 
-      // 3. Fetch Recent Users (Activity Feed)
+      // Recent Users
       try {
         const users = await adminFetch("/admin/recent-users");
         const list = document.getElementById("recentActivityList");
         
-        list.innerHTML = users.map(u => `
-          <div class="activity-item">
-            <span class="activity-icon"><i data-lucide="user-plus"></i></span>
-            <div class="activity-copy">
-              <strong>${u.firstName} ${u.lastName}</strong>
-              <p>${u.email}</p>
+        if (users.length === 0) {
+          list.innerHTML = `<p class="text-xs text-center text-slate-400">No recent registrations.</p>`;
+        } else {
+          list.innerHTML = users.map(u => {
+            const initials = `${u.firstName?.[0] || ''}${u.lastName?.[0] || ''}`.toUpperCase();
+            return `
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                ${initials}
+              </div>
+              <div class="flex-1 min-w-0">
+                <strong class="block text-sm font-semibold text-slate-800 truncate">${u.firstName} ${u.lastName}</strong>
+                <p class="text-xs text-slate-500 truncate mt-0.5">${u.email}</p>
+              </div>
+              <span class="text-[10px] font-semibold text-slate-400 whitespace-nowrap">${new Date(u.createdAt).toLocaleDateString(undefined, {month: 'short', day: 'numeric'})}</span>
             </div>
-            <span class="activity-time">${new Date(u.createdAt).toLocaleDateString()}</span>
-          </div>
-        `).join('');
-        
-        if (window.lucide) lucide.createIcons();
-      } catch (err) {
-        console.error("Users error:", err);
-      }
+          `}).join('');
+        }
+      } catch (err) { console.error("Users error:", err); }
     });
   </script>
 </body>

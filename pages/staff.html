@@ -9,6 +9,16 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="../assets/css/admin.css">
   <style>
+    /* Premium Card Style */
+    .smart-card {
+      background: #ffffff;
+      border: 1px solid #f1f5f9;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.01);
+      transition: all 0.2s ease;
+    }
+    .smart-card:hover { border-color: #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+
     /* Premium Modal Styles */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
@@ -17,118 +27,197 @@
     }
     .modal-overlay.active { opacity: 1; visibility: visible; }
     .premium-modal {
-      background: #fff; width: 100%; max-width: 450px; border-radius: 16px;
+      background: #fff; width: 100%; max-width: 800px; border-radius: 20px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: translateY(20px);
-      transition: transform 0.2s ease; overflow: hidden;
+      transition: transform 0.2s ease; overflow: hidden; display: flex; flex-direction: column; max-height: 90vh;
     }
     .modal-overlay.active .premium-modal { transform: translateY(0); }
-    .modal-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
-    .modal-body { padding: 24px; }
-    .modal-footer { padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px; background: #f8fafc; }
     
-    .input-group { margin-bottom: 16px; }
-    .input-group label { display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px; }
-    .input-group input, .input-group select {
-      width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px;
-      font-size: 14px; outline: none; transition: border 0.2s;
-    }
-    .input-group input:focus, .input-group select:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(67,137,238,0.1); }
+    /* Skeleton Loading */
+    .skeleton-row td { padding: 20px 24px; border-bottom: 1px solid #f1f5f9; }
+    .skeleton-box { height: 16px; background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* Role Permission Matrix Table */
+    .matrix-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .matrix-table td { font-size: 13px; font-weight: 500; }
+    .check-icon { color: #10b981; }
+    .cross-icon { color: #ef4444; }
   </style>
 </head>
-<body data-page="staff">
+<body data-page="staff" class="bg-[#fafafa] text-slate-900">
   <div class="app-shell">
     <div id="sidebar-host"></div>
     <div class="mobile-overlay" data-close-sidebar></div>
     
-    <div class="main-area">
-      <header class="topbar">
-        <div class="topbar-left">
-          <button class="icon-button menu-button" type="button" data-open-sidebar aria-label="Open navigation"><i data-lucide="menu"></i></button>
-          <span class="topbar-title">Staff & Roles</span>
+    <div class="main-area min-h-screen">
+      <header class="topbar bg-white border-b border-slate-200/60 sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button class="lg:hidden text-slate-500 hover:text-slate-800" data-open-sidebar><i data-lucide="menu" class="w-5 h-5"></i></button>
+          <h1 class="text-lg font-semibold text-slate-800 tracking-tight">Staff & Roles</h1>
         </div>
-        <div class="topbar-actions">
-          <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
-          <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
-          <button class="profile-button" type="button" onclick="logoutAdmin()"><span class="avatar">AD</span><span class="profile-copy"><strong>Admin Console</strong><small>Click to logout</small></span><i data-lucide="log-out" style="width:14px;height:14px;color:#8b95a7"></i></button>
+        <div class="flex items-center gap-4">
+          <button class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-500 hover:bg-slate-100 transition"><i data-lucide="bell" class="w-4 h-4"></i></button>
+          <div class="h-5 w-px bg-slate-200"></div>
+          <button onclick="logoutAdmin()" class="flex items-center gap-2 group">
+            <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold border border-blue-100">AD</div>
+            <span class="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition hidden sm:block">Logout</span>
+            <i data-lucide="log-out" class="w-4 h-4 text-slate-400 group-hover:text-red-500 transition"></i>
+          </button>
         </div>
       </header>
       
-      <main class="page-content">
-        <div class="page-heading">
-          <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>Staff & Roles</h1><p>Manage staff accounts and permission boundaries.</p></div>
-          <div class="heading-actions">
-            <button class="button" type="button" onclick="loadData()"><i data-lucide="refresh-cw"></i> Refresh</button>
-          </div>
-        </div>
+      <main class="p-6 max-w-[1400px] mx-auto space-y-6">
         
-        <div class="alert-box" style="margin-bottom: 24px; display: flex; gap: 12px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
-          <i data-lucide="shield-alert" style="color: #64748b;"></i>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <strong style="display: block; font-size: 14px; color: #1e293b;">Permission safety</strong>
-            <span style="font-size: 13px; color: #64748b;">Ensure you only grant staff roles to trusted individuals. Super Admins have full system access.</span>
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">NUMBAHUB / ADMINISTRATION</p>
+            <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Staff & Roles</h2>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="exportToCSV()" class="text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2">
+              <i data-lucide="download" class="w-4 h-4"></i> Export CSV
+            </button>
+            <button onclick="loadData()" class="text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition flex items-center gap-2">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i> Refresh
+            </button>
           </div>
         </div>
 
-        <div class="stats-grid">
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Staff accounts</span><span class="stat-icon"><i data-lucide="users"></i></span></div>
-            <div class="stat-value" id="staffTotal">...</div>
-            <div class="stat-foot">Active staff members</div>
-          </article>
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Super admins</span><span class="stat-icon"><i data-lucide="shield-check"></i></span></div>
-            <div class="stat-value" id="staffSuperAdmins">...</div>
-            <div class="stat-foot">Keep privileged access limited</div>
-          </article>
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Pending invites</span><span class="stat-icon"><i data-lucide="mail"></i></span></div>
-            <div class="stat-value" id="staffPending">...</div>
-            <div class="stat-foot">Awaiting acceptance</div>
-          </article>
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">MFA enabled</span><span class="stat-icon"><i data-lucide="key-round"></i></span></div>
-            <div class="stat-value" id="staffMfa">...</div>
-            <div class="stat-foot">Security metric</div>
-          </article>
+        <!-- Permission Safety Alert -->
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3 text-blue-800 items-start">
+          <i data-lucide="shield-alert" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+          <div>
+            <strong class="block text-sm font-bold">Permission Safety</strong>
+            <span class="text-xs text-blue-700 mt-1 block leading-relaxed">Ensure you only grant staff roles to trusted individuals. Super Admins have full system access, including billing and user management.</span>
+          </div>
         </div>
 
-        <div class="table-panel">
-          <div class="table-toolbar">
-            <div><h2>Staff directory</h2><p class="panel-subtitle">Staff accounts and assigned roles.</p></div>
-            <div class="toolbar-controls">
-              <div class="table-search">
-                <i data-lucide="search"></i>
-                <input class="input-control" id="staffSearch" placeholder="Search staff..." onkeyup="handleSearch()">
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Staff Accounts</span>
+              <i data-lucide="users" class="w-4 h-4 text-blue-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="staffTotal">...</div>
+            <div class="text-xs text-slate-400 font-medium mt-1">Active staff members</div>
+          </div>
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Super Admins</span>
+              <i data-lucide="shield-check" class="w-4 h-4 text-purple-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="staffSuperAdmins">...</div>
+            <div class="text-xs text-slate-400 font-medium mt-1">Keep privileged access limited</div>
+          </div>
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Pending Invites</span>
+              <i data-lucide="mail" class="w-4 h-4 text-orange-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="staffPending">...</div>
+            <div class="text-xs text-slate-400 font-medium mt-1">Awaiting acceptance</div>
+          </div>
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">MFA Enabled</span>
+              <i data-lucide="key-round" class="w-4 h-4 text-emerald-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="staffMfa">...</div>
+            <div class="text-xs text-slate-400 font-medium mt-1">Security metric</div>
+          </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="smart-card overflow-hidden">
+          <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Staff Directory</h3>
+              <p class="text-xs text-slate-500 mt-1">Manage staff accounts and their permissions.</p>
+            </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+              <div class="relative w-full sm:w-64">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                <input class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:bg-white transition" id="staffSearch" placeholder="Search name or email..." onkeyup="handleSearch()">
               </div>
-              <!-- 🟢 OPEN INVITE MODAL -->
-              <button class="button button-primary" onclick="openInviteModal()"><i data-lucide="user-plus"></i> Invite staff</button>
+              <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg shadow-sm shadow-blue-500/30 transition flex items-center gap-2" onclick="openInviteModal()">
+                <i data-lucide="user-plus" class="w-4 h-4"></i> Invite Staff
+              </button>
             </div>
           </div>
           
-          <div class="table-wrap">
-            <table id="staff-table">
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
               <thead>
-                <tr><th>Staff member</th><th>Role</th><th>Joined</th><th>Status</th><th>Actions</th></tr>
+                <tr class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold border-b border-slate-100 bg-slate-50/50">
+                  <th class="px-6 py-4">Staff Member</th>
+                  <th class="px-6 py-4">Role</th>
+                  <th class="px-6 py-4">Joined</th>
+                  <th class="px-6 py-4">Status</th>
+                  <th class="px-6 py-4 text-right">Actions</th>
+                </tr>
               </thead>
-              <tbody id="staffTableBody">
-                <tr><td colspan="5" style="text-align: center;">Loading staff...</td></tr>
+              <tbody id="staffTableBody" class="text-sm text-slate-700 divide-y divide-slate-100">
+                <!-- Skeleton Loader -->
+                <tr class="skeleton-row"><td><div class="skeleton-box w-3/4"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/3"></div></td><td><div class="skeleton-box w-1/4 ml-auto"></div></td></tr>
+                <tr class="skeleton-row"><td><div class="skeleton-box w-2/3"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/3"></div></td><td><div class="skeleton-box w-1/4 ml-auto"></div></td></tr>
               </tbody>
             </table>
           </div>
+          
+          <div class="p-4 border-t border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <span id="tableInfo" class="text-xs font-medium text-slate-500">Showing 0 staff members</span>
+            <div class="pagination flex gap-1" id="paginationControls"></div>
+          </div>
         </div>
         
-        <div class="panel" style="margin-top: 24px;">
-          <div class="panel-header">
-            <div><h2 class="panel-title">Role permissions overview</h2><p class="panel-subtitle">Enforced roles across the platform.</p></div>
+        <!-- Role Permissions Matrix -->
+        <div class="smart-card overflow-hidden mt-6">
+          <div class="p-5 border-b border-slate-100">
+            <h3 class="text-base font-bold text-slate-900">Role Permissions Overview</h3>
+            <p class="text-xs text-slate-500 mt-1">Enforced permission boundaries across the platform.</p>
           </div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Permission area</th><th>Super Admin</th><th>Operations</th><th>Finance</th><th>Support</th></tr></thead>
-              <tbody>
-                <tr><td>Manage users</td><td>Full</td><td>Limited</td><td>View</td><td>Limited</td></tr>
-                <tr><td>Issue refunds</td><td>Approve</td><td>No</td><td>Request / approve</td><td>Request only</td></tr>
-                <tr><td>Manage providers</td><td>Full</td><td>Full</td><td>View</td><td>No</td></tr>
-                <tr><td>Manage staff</td><td>Full</td><td>No</td><td>No</td><td>No</td></tr>
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse matrix-table">
+              <thead>
+                <tr class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold border-b border-slate-100 bg-slate-50/50">
+                  <th class="px-6 py-3">Permission Area</th>
+                  <th class="px-6 py-3 text-center">Super Admin</th>
+                  <th class="px-6 py-3 text-center">Operations</th>
+                  <th class="px-6 py-3 text-center">Finance</th>
+                  <th class="px-6 py-3 text-center">Support</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-slate-600">
+                <tr>
+                  <td class="px-6 py-4 font-semibold text-slate-800">Manage Users</td>
+                  <td class="px-6 py-4 text-center"><i data-lucide="check-circle" class="check-icon w-5 h-5 mx-auto"></i></td>
+                  <td class="px-6 py-4 text-center"><i data-lucide="check-circle" class="check-icon w-5 h-5 mx-auto"></i></td>
+                  <td class="px-6 py-4 text-center text-xs font-semibold">View Only</td>
+                  <td class="px-6 py-4 text-center"><i data-lucide="check-circle" class="check-icon w-5 h-5 mx-auto"></i></td>
+                </tr>
+                <tr>
+                  <td class="px-6 py-4 font-semibold text-slate-800">Issue Refunds</td>
+                  <td class="px-6 py-4 text-center"><i data-lucide="check-circle" class="check-icon w-5 h-5 mx-auto"></i></td>
+                  <td class="px-6 py-4 text-center"><i data-lucide="x-circle" class="cross-icon w-5 h-5 mx-auto"></i></td>
+                  <td class="px-6 py-4 text-center"><i data-lucide="check-circle" class="check-icon w-5 h-5 mx-auto"></i></td>
+                  <td class="px-6 py-4 text-center text-xs font-semibold">Request Only</td>
+                </tr>
+                <tr>
+                  <td class="px-6 py-4 font-semibold text-slate-800">Manage Providers & APIs</td>
+                  <td class="px-6 py-4 text-center"><i data-lucide="check-circle" class="check-icon w-5 h-5 mx-auto"></i></td>
+                  <td class="px-6 py-4 text-center"><i data-lucide="check-circle" class="check-icon w-5 h-5 mx-auto"></i></td>
+                  <td class="px-6 py-4 text-center text-xs font-semibold">View Only</td>
+                  <td class="px-6 py-4 text-center"><i data-lucide="x-circle" class="cross-icon w-5 h-5 mx-auto"></i></td>
+                </tr>
+                <tr>
+                  <td class="px-6 py-4 font-semibold text-slate-800">Manage Staff</td>
+                  <td class="px-6 py-4 text-center"><i data-lucide="check-circle" class="check-icon w-5 h-5 mx-auto"></i></td>
+                  <td class="px-6 py-4 text-center"><i data-lucide="x-circle" class="cross-icon w-5 h-5 mx-auto"></i></td>
+                  <td class="px-6 py-4 text-center"><i data-lucide="x-circle" class="cross-icon w-5 h-5 mx-auto"></i></td>
+                  <td class="px-6 py-4 text-center"><i data-lucide="x-circle" class="cross-icon w-5 h-5 mx-auto"></i></td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -139,79 +228,134 @@
 
   <!-- 🟢 INVITE STAFF MODAL -->
   <div class="modal-overlay" id="inviteModal">
-    <div class="premium-modal">
-      <div class="modal-header">
-        <h2 style="margin: 0; font-size: 18px; font-weight: 700;">Invite New Staff</h2>
-        <button class="icon-button" onclick="closeModal('inviteModal')"><i data-lucide="x"></i></button>
+    <div class="premium-modal" style="max-width: 500px;">
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
+        <h2 class="text-lg font-bold text-slate-900">Invite New Staff</h2>
+        <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition" onclick="closeModal('inviteModal')"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <div class="modal-body">
-        <div class="input-group">
-          <label>First Name</label>
-          <input type="text" id="inviteFirstName" placeholder="John">
-        </div>
-        <div class="input-group">
-          <label>Last Name</label>
-          <input type="text" id="inviteLastName" placeholder="Doe">
-        </div>
-        <div class="input-group">
-          <label>Email Address</label>
-          <input type="email" id="inviteEmail" placeholder="john@numbahub.com">
-        </div>
-        <div class="input-group">
-          <label>Assign Role</label>
-          <select id="inviteRole">
-            <option value="operations">Operations</option>
-            <option value="finance">Finance</option>
-            <option value="support">Customer Support</option>
-            <option value="super_admin">Super Admin</option>
-          </select>
+      
+      <div class="p-6 bg-slate-50/50" id="inviteFormContainer">
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">First Name</label>
+              <input type="text" id="inviteFirstName" class="w-full p-3 bg-white border border-slate-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500 transition" placeholder="John">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Last Name</label>
+              <input type="text" id="inviteLastName" class="w-full p-3 bg-white border border-slate-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500 transition" placeholder="Doe">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
+            <input type="email" id="inviteEmail" class="w-full p-3 bg-white border border-slate-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500 transition" placeholder="john@numbahub.com">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Assign Role</label>
+            <select id="inviteRole" class="w-full p-3 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 outline-none cursor-pointer">
+              <option value="operations">Operations</option>
+              <option value="finance">Finance</option>
+              <option value="support">Customer Support</option>
+              <option value="super_admin">Super Admin</option>
+            </select>
+          </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="button" onclick="closeModal('inviteModal')">Cancel</button>
-        <button class="button button-primary" id="inviteBtn" onclick="submitInvite()">Send Invite</button>
+
+      <!-- Success State (Hidden by default) -->
+      <div class="p-8 text-center hidden" id="inviteSuccessContainer">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="check-circle" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900 mb-2">Staff Invited!</h3>
+        <p class="text-sm text-slate-500 mb-6">Provide this temporary password to the staff member so they can log in.</p>
+        
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-between mb-6">
+          <span class="text-sm font-mono font-bold text-slate-800" id="displayTempPassword">...</span>
+          <button class="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1.5 rounded-md transition" onclick="copyPassword()">Copy</button>
+        </div>
+        
+        <button class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition" onclick="closeInviteSuccess()">Done</button>
+      </div>
+
+      <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-3 bg-white" id="inviteFooter">
+        <button class="px-5 py-2.5 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition" onclick="closeModal('inviteModal')">Cancel</button>
+        <button class="px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/30 transition flex items-center gap-2" id="inviteBtn" onclick="submitInvite()">
+          <i data-lucide="send" class="w-4 h-4"></i> Send Invite
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- 🟢 MANAGE STAFF MODAL -->
+  <!-- 🟢 MANAGE STAFF MODAL (Split Layout) -->
   <div class="modal-overlay" id="manageModal">
     <div class="premium-modal">
-      <div class="modal-header">
-        <h2 style="margin: 0; font-size: 18px; font-weight: 700;">Manage Staff</h2>
-        <button class="icon-button" onclick="closeModal('manageModal')"><i data-lucide="x"></i></button>
-      </div>
-      <div class="modal-body">
-        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
-          <div class="mini-avatar" id="manageAvatar" style="width: 56px; height: 56px; font-size: 20px;">S</div>
+      
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg" id="manageAvatar">S</div>
           <div>
-            <h3 style="margin: 0 0 4px; font-size: 16px; font-weight: 700;" id="manageName">Staff Name</h3>
-            <p style="margin: 0; color: #64748b; font-size: 14px;" id="manageEmail">email@example.com</p>
+            <h2 class="text-lg font-bold text-slate-900 leading-tight" id="manageName">Staff Name</h2>
+            <p class="text-xs text-slate-500" id="manageEmail">email@example.com</p>
+          </div>
+        </div>
+        <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition" onclick="closeModal('manageModal')"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      
+      <div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50/50">
+        
+        <!-- Left: Details -->
+        <div class="space-y-6">
+          <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">Staff Information</h3>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+              <span class="text-xs font-medium text-slate-500">Staff ID</span>
+              <span class="text-xs font-mono font-semibold text-slate-800" id="manageId">-</span>
+            </div>
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+              <span class="text-xs font-medium text-slate-500">Joined Date</span>
+              <span class="text-xs font-semibold text-slate-800" id="manageJoined">-</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-medium text-slate-500">Current Role</span>
+              <span class="px-2 py-1 bg-purple-50 text-purple-700 rounded text-[10px] font-bold uppercase" id="manageCurrentRole">Role</span>
+            </div>
           </div>
         </div>
 
-        <div class="input-group">
-          <label>Role</label>
-          <select id="manageRole">
-            <option value="operations">Operations</option>
-            <option value="finance">Finance</option>
-            <option value="support">Customer Support</option>
-            <option value="super_admin">Super Admin</option>
-          </select>
-        </div>
+        <!-- Right: Actions -->
+        <div class="space-y-6">
+          <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">Update Permissions</h3>
+          
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-5">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-2">Assign Role</label>
+              <select id="manageRole" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 cursor-pointer transition">
+                <option value="operations">Operations</option>
+                <option value="finance">Finance</option>
+                <option value="support">Customer Support</option>
+                <option value="super_admin">Super Admin</option>
+              </select>
+            </div>
 
-        <div class="input-group">
-          <label>Account Status</label>
-          <select id="manageStatus">
-            <option value="Active">Active</option>
-            <option value="Suspended">Suspended</option>
-            <option value="Inactive">Inactive</option>
-          </select>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-2">Account Status</label>
+              <select id="manageStatus" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 cursor-pointer transition">
+                <option value="Active">🟢 Active</option>
+                <option value="Suspended">🔴 Suspended</option>
+                <option value="Inactive">⚪ Inactive</option>
+                <option value="Invited">🟡 Invited</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="button" onclick="closeModal('manageModal')">Cancel</button>
-        <button class="button button-primary" id="manageBtn" onclick="saveStaffChanges()">Save Changes</button>
+      
+      <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-3 bg-white">
+        <button class="px-5 py-2.5 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition" onclick="closeModal('manageModal')">Cancel</button>
+        <button class="px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/30 transition flex items-center gap-2" id="manageBtn" onclick="saveStaffChanges()">
+          <i data-lucide="save" class="w-4 h-4"></i> Save Changes
+        </button>
       </div>
     </div>
   </div>
@@ -224,6 +368,7 @@
     let currentPage = 1;
     let searchQuery = "";
     let selectedStaffId = null;
+    let currentStaffList = []; // For CSV Export
 
     async function adminFetch(endpoint, options = {}) {
       const token = localStorage.getItem("adminToken");
@@ -233,7 +378,9 @@
         headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", ...options.headers } 
       });
       if (res.status === 401 || res.status === 403) { localStorage.removeItem("adminToken"); window.location.href = "login.html"; return; }
-      return await res.json();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Request failed");
+      return data;
     }
 
     async function loadSidebar() {
@@ -247,9 +394,15 @@
         html = html.replace(/__ROOT__/g, rootPath);
         host.innerHTML = html;
         
+        const adminUser = JSON.parse(localStorage.getItem("adminUser") || "{}");
+        if (adminUser.firstName) {
+          document.getElementById("sidebarAdminName").textContent = `${adminUser.firstName} ${adminUser.lastName || ''}`.trim();
+          document.getElementById("sidebarAdminEmail").textContent = adminUser.email;
+        }
+
         const currentPage = document.body.dataset.page || 'dashboard';
         const activeLink = host.querySelector(`a[data-nav="${currentPage}"]`);
-        if (activeLink) { activeLink.style.background = 'var(--brand)'; activeLink.style.color = '#fff'; }
+        if (activeLink) activeLink.classList.add('active');
         if (window.lucide) lucide.createIcons();
         
         const sidebarLogoutBtn = host.querySelector('[data-action="logout"]');
@@ -273,22 +426,25 @@
     async function loadStats() {
       try {
         const stats = await adminFetch("/admin/staff/stats");
-        document.getElementById("staffTotal").textContent = stats.totalStaff;
-        document.getElementById("staffSuperAdmins").textContent = stats.superAdmins;
-        document.getElementById("staffPending").textContent = stats.pendingInvites;
+        document.getElementById("staffTotal").textContent = stats.totalStaff.toLocaleString();
+        document.getElementById("staffSuperAdmins").textContent = stats.superAdmins.toLocaleString();
+        document.getElementById("staffPending").textContent = stats.pendingInvites.toLocaleString();
         document.getElementById("staffMfa").textContent = `${stats.mfaEnabled}%`;
       } catch (err) { console.error("Stats error:", err); }
     }
 
     async function loadStaff() {
       const tbody = document.getElementById("staffTableBody");
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Loading...</td></tr>`;
+      const url = `/admin/staff?page=${currentPage}&limit=10&search=${searchQuery}`;
 
       try {
-        const data = await adminFetch(`/admin/staff?page=${currentPage}&limit=10&search=${searchQuery}`);
+        const data = await adminFetch(url);
+        currentStaffList = data.staff; // Save for export
         
         if (data.staff.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No staff members found.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">No staff members found.</td></tr>`;
+          document.getElementById("tableInfo").textContent = `Showing 0 staff members`;
+          document.getElementById("paginationControls").innerHTML = "";
           return;
         }
 
@@ -296,39 +452,77 @@
           const initials = `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase();
           const joinedDate = new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
           
-          let roleDisplay = user.role.replace('_', ' ');
-          roleDisplay = roleDisplay.charAt(0).toUpperCase() + roleDisplay.slice(1);
+          // Role Badge Styling
+          let roleDisplay = user.role.replace('_', ' ').toUpperCase();
+          let roleClass = "bg-slate-100 text-slate-600 border-slate-200"; // Default
+          if (user.role === "super_admin" || user.role === "admin") roleClass = "bg-purple-50 text-purple-700 border-purple-200";
+          if (user.role === "finance") roleClass = "bg-blue-50 text-blue-700 border-blue-200";
+          if (user.role === "support") roleClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+          if (user.role === "operations") roleClass = "bg-orange-50 text-orange-700 border-orange-200";
 
-          let statusClass = "";
-          if (user.status === "Suspended" || user.status === "Inactive") statusClass = "suspended";
-          if (user.status === "Invited") statusClass = "pending";
+          // Status Badge Styling
+          let statusClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+          if (user.status === "Suspended") statusClass = "bg-red-50 text-red-700 border-red-200";
+          if (user.status === "Inactive") statusClass = "bg-slate-100 text-slate-600 border-slate-200";
+          if (user.status === "Invited") statusClass = "bg-orange-50 text-orange-700 border-orange-200";
 
           return `
-            <tr>
-              <td>
-                <div class="user-cell">
-                  <span class="mini-avatar">${initials}</span>
-                  <span>
-                    <span class="cell-primary">${user.firstName} ${user.lastName}</span>
-                    <span class="cell-secondary">${user.email}</span>
-                  </span>
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs shadow-sm">
+                    ${initials}
+                  </div>
+                  <div>
+                    <div class="font-semibold text-slate-900 text-sm">${user.firstName} ${user.lastName}</div>
+                    <div class="text-xs text-slate-500">${user.email}</div>
+                  </div>
                 </div>
               </td>
-              <td>${roleDisplay}</td>
-              <td>${joinedDate}</td>
-              <td><span class="status ${statusClass}">${user.status}</span></td>
-              <td>
-                <button class="button button-small" onclick="openManageModal('${user._id}', '${user.firstName}', '${user.lastName}', '${user.email}', '${user.role}', '${user.status}')">Manage</button>
+              <td class="px-6 py-4">
+                <span class="px-2 py-1 border rounded-md text-[10px] font-bold ${roleClass}">${roleDisplay}</span>
+              </td>
+              <td class="px-6 py-4 text-slate-500 text-xs">${joinedDate}</td>
+              <td class="px-6 py-4">
+                <span class="px-2.5 py-1 border rounded-full text-xs font-bold ${statusClass}">${user.status}</span>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <button class="px-4 py-2 bg-blue-50 text-blue-600 border border-blue-100 text-xs font-bold rounded-lg transition-all hover:bg-blue-600 hover:text-white hover:border-blue-600 shadow-sm" onclick="openManageModal('${user._id}', '${user.firstName}', '${user.lastName}', '${user.email}', '${user.role}', '${user.status}', '${user.createdAt}')">
+                  Manage
+                </button>
               </td>
             </tr>
           `;
         }).join('');
 
+        document.getElementById("tableInfo").textContent = `Showing ${data.staff.length} of ${data.totalStaff} staff members`;
+        renderPagination(data.totalPages, data.currentPage);
+
       } catch (err) {
         console.error("Staff error:", err);
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Failed to load staff.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-red-500">Failed to load staff.</td></tr>`;
       }
     }
+
+    function renderPagination(totalPages, current) {
+      const container = document.getElementById("paginationControls");
+      let html = "";
+      if (totalPages > 1) {
+        html += `<button ${current === 1 ? 'disabled' : ''} class="p-1.5 rounded-md border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50" onclick="changePage(${current - 1})"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>`;
+        for (let i = 1; i <= totalPages; i++) {
+          if (i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {
+            html += `<button class="w-8 h-8 rounded-md border ${i === current ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'border-slate-200 text-slate-600 hover:bg-slate-50'} text-xs font-semibold transition" onclick="changePage(${i})">${i}</button>`;
+          } else if (i === current - 2 || i === current + 2) {
+            html += `<span class="text-slate-400 px-1">...</span>`;
+          }
+        }
+        html += `<button ${current === totalPages ? 'disabled' : ''} class="p-1.5 rounded-md border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50" onclick="changePage(${current + 1})"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>`;
+      }
+      container.innerHTML = html;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function changePage(page) { currentPage = page; loadStaff(); }
 
     let searchTimeout;
     function handleSearch() {
@@ -340,28 +534,65 @@
       }, 500);
     }
 
-    function loadData() {
-      loadStats();
-      loadStaff();
-    }
+    function loadData() { loadStats(); loadStaff(); }
 
-    // 🟢 MODAL LOGIC
-    window.closeModal = (id) => {
-      document.getElementById(id).classList.remove("active");
+    // 🟢 CSV EXPORT
+    window.exportToCSV = () => {
+      if (currentStaffList.length === 0) return alert("No data to export on this page.");
+      
+      const headers = ["First Name", "Last Name", "Email", "Role", "Status", "Joined Date"];
+      const rows = currentStaffList.map(u => [
+        u.firstName, u.lastName, u.email, u.role, u.status, new Date(u.createdAt).toISOString()
+      ]);
+
+      let csvContent = headers.join(",") + "\n";
+      rows.forEach(row => {
+        csvContent += row.map(v => `"${v}"`).join(",") + "\n";
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.setAttribute("href", URL.createObjectURL(blob));
+      link.setAttribute("download", `numbahub_staff_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     };
 
+    // 🟢 INVITE MODAL LOGIC
     window.openInviteModal = () => {
+      document.getElementById("inviteFormContainer").classList.remove("hidden");
+      document.getElementById("inviteFooter").classList.remove("hidden");
+      document.getElementById("inviteSuccessContainer").classList.add("hidden");
+      
       document.getElementById("inviteFirstName").value = "";
       document.getElementById("inviteLastName").value = "";
       document.getElementById("inviteEmail").value = "";
       document.getElementById("inviteModal").classList.add("active");
     };
 
+    window.closeModal = (id) => {
+      document.getElementById(id).classList.remove("active");
+    };
+
+    window.closeInviteSuccess = () => {
+      closeModal("inviteModal");
+      loadData();
+    };
+
+    window.copyPassword = () => {
+      const pass = document.getElementById("displayTempPassword").textContent;
+      navigator.clipboard.writeText(pass).then(() => {
+        alert("Password copied to clipboard!");
+      });
+    };
+
     window.submitInvite = async () => {
       const btn = document.getElementById("inviteBtn");
-      const originalText = btn.textContent;
+      const originalText = btn.innerHTML;
       btn.disabled = true;
-      btn.textContent = "Sending...";
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Sending...`;
+      if (window.lucide) lucide.createIcons();
 
       const payload = {
         firstName: document.getElementById("inviteFirstName").value.trim(),
@@ -376,26 +607,33 @@
           body: JSON.stringify(payload)
         });
         
-        // Show the temp password to the admin
-        alert(`Staff invited successfully!\n\nTemporary Password: ${res.tempPassword}\n\nPlease share this with them securely.`);
-        
-        closeModal("inviteModal");
-        loadData();
+        // Show the beautiful success state
+        document.getElementById("inviteFormContainer").classList.add("hidden");
+        document.getElementById("inviteFooter").classList.add("hidden");
+        document.getElementById("inviteSuccessContainer").classList.remove("hidden");
+        document.getElementById("displayTempPassword").textContent = res.tempPassword;
+
       } catch (err) {
         alert(err.message || "Failed to invite staff");
       } finally {
         btn.disabled = false;
-        btn.textContent = originalText;
+        btn.innerHTML = originalText;
+        if (window.lucide) lucide.createIcons();
       }
     };
 
-    window.openManageModal = (id, firstName, lastName, email, role, status) => {
+    // 🟢 MANAGE MODAL LOGIC
+    window.openManageModal = (id, firstName, lastName, email, role, status, joinedDate) => {
       selectedStaffId = id;
       const initials = `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
       
       document.getElementById("manageAvatar").textContent = initials;
       document.getElementById("manageName").textContent = `${firstName} ${lastName}`;
       document.getElementById("manageEmail").textContent = email;
+      document.getElementById("manageId").textContent = id.substring(0, 12) + "...";
+      document.getElementById("manageJoined").textContent = new Date(joinedDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      document.getElementById("manageCurrentRole").textContent = role.replace('_', ' ');
+      
       document.getElementById("manageRole").value = role;
       document.getElementById("manageStatus").value = status;
       
@@ -405,9 +643,10 @@
     window.saveStaffChanges = async () => {
       if (!selectedStaffId) return;
       const btn = document.getElementById("manageBtn");
-      const originalText = btn.textContent;
+      const originalText = btn.innerHTML;
       btn.disabled = true;
-      btn.textContent = "Saving...";
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Saving...`;
+      if (window.lucide) lucide.createIcons();
 
       const payload = {
         role: document.getElementById("manageRole").value,
@@ -426,7 +665,8 @@
         alert(err.message || "Failed to update staff");
       } finally {
         btn.disabled = false;
-        btn.textContent = originalText;
+        btn.innerHTML = originalText;
+        if (window.lucide) lucide.createIcons();
       }
     };
 

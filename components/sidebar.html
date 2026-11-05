@@ -1,34 +1,85 @@
-<aside class="sidebar" id="admin-sidebar">
-  <a class="brand" href="__ROOT__index.html" aria-label="NumbaHub admin home">
-    <span class="brand-mark"><i data-lucide="layers"></i></span>
-    <span class="brand-copy"><strong>NumbaHub</strong><small>ADMIN CONSOLE</small></span>
+<aside class="sidebar" id="admin-sidebar" style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-right: 1px solid #e2e8f0; width: 280px; display: flex; flex-direction: column; height: 100vh; position: fixed; top: 0; left: 0; z-index: 100; box-shadow: 4px 0 24px rgba(0,0,0,0.02);">
+  
+  <!-- Brand -->
+  <a href="__ROOT__index.html" style="padding: 32px 24px; display: flex; align-items: center; gap: 12px; text-decoration: none;">
+    <div style="width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #3179df 0%, #2563eb 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(49, 121, 223, 0.4);">
+      <i data-lucide="layers" style="color: white; width: 20px; height: 20px;"></i>
+    </div>
+    <div style="display: flex; flex-direction: column;">
+      <strong style="color: #0f172a; font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">NumbaHub</strong>
+      <small style="color: #64748b; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;">Admin Console</small>
+    </div>
   </a>
-  <div class="sidebar-label">WORKSPACE</div>
-  <nav class="sidebar-nav" aria-label="Admin navigation">
-    <a href="__ROOT__index.html" data-nav="dashboard"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
-    <a href="__ROOT__pages/users.html" data-nav="users"><i data-lucide="users"></i><span>Users</span></a>
-    <a href="__ROOT__pages/staff.html" data-nav="staff"><i data-lucide="user-cog"></i><span>Staff & Roles</span></a>
-    <a href="__ROOT__pages/finance.html" data-nav="finance"><i data-lucide="wallet"></i><span>Finance</span></a>
-    <a href="__ROOT__pages/services.html" data-nav="services"><i data-lucide="package"></i><span>Services</span></a>
-    <a href="__ROOT__pages/orders.html" data-nav="orders"><i data-lucide="receipt-text"></i><span>Orders & Transactions</span></a>
-    <!-- <a href="__ROOT__pages/providers.html" data-nav="providers"><i data-lucide="plug"></i><span>Providers & APIs</span></a> -->
-    <a href="__ROOT__pages/pricing.html" data-nav="pricing"><i data-lucide="tags"></i><span>Pricing</span></a>
-    <a href="__ROOT__pages/support.html" data-nav="support"><i data-lucide="headset"></i><span>Customer Support</span></a>
-    <a href="__ROOT__pages/marketing.html" data-nav="marketing"><i data-lucide="megaphone"></i><span>Marketing</span></a>
-    <a href="__ROOT__pages/reports.html" data-nav="reports"><i data-lucide="chart-no-axes-combined"></i><span>Reports</span></a>
-    <a href="__ROOT__pages/audit.html" data-nav="audit"><i data-lucide="shield-check"></i><span>Audit & Security</span></a>
-    <a href="__ROOT__pages/settings.html" data-nav="settings"><i data-lucide="settings"></i><span>Settings</span></a>
+
+  <div style="padding: 0 24px; margin-bottom: 8px; font-size: 11px; font-weight: 700; color: #94a3b8; letter-spacing: 1px;">WORKSPACE</div>
+  
+  <!-- Navigation -->
+  <nav style="flex: 1; overflow-y: auto; padding: 0 16px 24px 16px; display: flex; flex-direction: column; gap: 4px;">
+    
+    <a href="__ROOT__index.html" data-nav="dashboard" class="nav-link" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s;">
+      <i data-lucide="layout-dashboard" style="width: 18px; height: 18px;"></i><span>Dashboard</span>
+    </a>
+    <a href="__ROOT__pages/users.html" data-nav="users" class="nav-link" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s;">
+      <i data-lucide="users" style="width: 18px; height: 18px;"></i><span>Users</span>
+    </a>
+    <a href="__ROOT__pages/staff.html" data-nav="staff" class="nav-link" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s;">
+      <i data-lucide="user-cog" style="width: 18px; height: 18px;"></i><span>Staff & Roles</span>
+    </a>
+    <a href="__ROOT__pages/finance.html" data-nav="finance" class="nav-link" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s;">
+      <i data-lucide="wallet" style="width: 18px; height: 18px;"></i><span>Finance</span>
+    </a>
+    <!-- <a href="__ROOT__pages/services.html" data-nav="services" class="nav-link" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s;">
+      <i data-lucide="package" style="width: 18px; height: 18px;"></i><span>Services</span>
+    </a> -->
+    <a href="__ROOT__pages/orders.html" data-nav="orders" class="nav-link" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s;">
+      <i data-lucide="receipt-text" style="width: 18px; height: 18px;"></i><span>Orders & Transactions</span>
+    </a>
+    <a href="__ROOT__pages/pricing.html" data-nav="pricing" class="nav-link" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s;">
+      <i data-lucide="tags" style="width: 18px; height: 18px;"></i><span>Pricing</span>
+    </a>
+    <a href="__ROOT__pages/support.html" data-nav="support" class="nav-link" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s;">
+      <i data-lucide="headset" style="width: 18px; height: 18px;"></i><span>Customer Support</span>
+    </a>
+    <a href="__ROOT__pages/marketing.html" data-nav="marketing" class="nav-link" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s;">
+      <i data-lucide="megaphone" style="width: 18px; height: 18px;"></i><span>Marketing</span>
+    </a>
+    <a href="__ROOT__pages/reports.html" data-nav="reports" class="nav-link" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s;">
+      <i data-lucide="chart-no-axes-combined" style="width: 18px; height: 18px;"></i><span>Reports</span>
+    </a>
+    <a href="__ROOT__pages/audit.html" data-nav="audit" class="nav-link" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s;">
+      <i data-lucide="shield-check" style="width: 18px; height: 18px;"></i><span>Audit & Security</span>
+    </a>
+    <a href="__ROOT__pages/settings.html" data-nav="settings" class="nav-link" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s;">
+      <i data-lucide="settings" style="width: 18px; height: 18px;"></i><span>Settings</span>
+    </a>
   </nav>
   
-  <!-- 🟢 DYNAMIC FOOTER -->
-  <div class="sidebar-footer">
-    <div class="environment-pill" style="display: flex; align-items: center; gap: 10px;">
-      <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 0 2px #d1fae5;"></span>
-      <div style="line-height: 1.3;">
-        <strong id="sidebarAdminName" style="font-size: 13px; color: #1e293b; display: block;">Loading...</strong>
-        <small id="sidebarAdminEmail" style="font-size: 11px; color: #64748b;">...</small>
+  <!-- Dynamic Footer (Glass Card Style) -->
+  <div style="padding: 20px; border-top: 1px solid #e2e8f0; background: rgba(248, 250, 252, 0.5);">
+    <div style="display: flex; align-items: center; gap: 12px; background: #ffffff; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+      <div style="width: 32px; height: 32px; border-radius: 50%; background: #eff6ff; color: #3179df; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">
+        <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+      </div>
+      <div style="line-height: 1.4; overflow: hidden;">
+        <strong id="sidebarAdminName" style="font-size: 13px; color: #0f172a; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</strong>
+        <small id="sidebarAdminEmail" style="font-size: 11px; color: #64748b; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">...</small>
       </div>
     </div>
-    <button class="sidebar-logout" type="button" data-action="logout"><i data-lucide="log-out"></i> Sign out</button>
+    <button type="button" data-action="logout" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: transparent; color: #ef4444; border: 1px solid #fecaca; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
+      <i data-lucide="log-out" style="width: 16px; height: 16px;"></i> Sign out
+    </button>
   </div>
+
+  <!-- Inline styles for the hover/active states -->
+  <style>
+    .nav-link { color: #64748b; }
+    .nav-link:hover { background: #f1f5f9; color: #0f172a; transform: translateX(4px); }
+    .nav-link.active { 
+      background: linear-gradient(90deg, #eff6ff 0%, #ffffff 100%); 
+      color: #3179df; 
+      box-shadow: 0 4px 12px rgba(49, 121, 223, 0.08);
+      border: 1px solid #dbeafe;
+    }
+    .nav-link.active i { color: #3179df; }
+  </style>
 </aside>

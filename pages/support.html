@@ -9,81 +9,143 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="../assets/css/admin.css">
   <style>
+    /* Premium Card Style */
+    .smart-card {
+      background: #ffffff;
+      border: 1px solid #f1f5f9;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.01);
+      transition: all 0.2s ease;
+    }
+    .smart-card:hover { border-color: #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+
     /* Premium Modal Styles */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 16px; opacity: 0; visibility: hidden; transition: all 0.2s ease; }
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 16px;
+      opacity: 0; visibility: hidden; transition: all 0.2s ease;
+    }
     .modal-overlay.active { opacity: 1; visibility: visible; }
-    .premium-modal { background: #fff; width: 100%; max-width: 700px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: translateY(20px); transition: transform 0.2s ease; overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; }
+    .premium-modal {
+      background: #fff; width: 100%; max-width: 800px; border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: translateY(20px);
+      transition: transform 0.2s ease; overflow: hidden; display: flex; flex-direction: column; height: 85vh;
+    }
     .modal-overlay.active .premium-modal { transform: translateY(0); }
-    .modal-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
-    .modal-body { padding: 24px; overflow-y: auto; flex: 1; background: #f8fafc; }
-    .modal-footer { padding: 16px 24px; border-top: 1px solid #e2e8f0; background: #fff; }
     
-    /* Chat Bubbles */
-    .chat-bubble { max-width: 80%; padding: 12px 16px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; line-height: 1.5; }
-    .chat-user { background: #fff; border: 1px solid #e2e8f0; color: #1e293b; align-self: flex-start; border-bottom-left-radius: 2px; }
-    .chat-admin { background: var(--brand); color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; margin-left: auto; }
-    .chat-meta { font-size: 11px; margin-bottom: 4px; opacity: 0.7; display: block; }
+    /* Chat Interface */
+    .chat-container {
+      flex: 1; overflow-y: auto; padding: 24px; background: #f8fafc;
+      display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth;
+    }
+    .chat-bubble {
+      max-width: 75%; padding: 14px 18px; border-radius: 16px; font-size: 14px; line-height: 1.6;
+      position: relative; animation: slideUp 0.3s ease;
+    }
+    .chat-user { background: #ffffff; border: 1px solid #e2e8f0; color: #1e293b; align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+    .chat-admin { background: #3179df; color: #ffffff; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(49, 121, 223, 0.2); }
+    .chat-meta { font-size: 11px; margin-bottom: 6px; display: block; font-weight: 500; }
+    
+    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Custom Scrollbar for Chat */
+    .chat-container::-webkit-scrollbar { width: 6px; }
+    .chat-container::-webkit-scrollbar-track { background: transparent; }
+    .chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .chat-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Skeleton Loading */
+    .skeleton-row td { padding: 20px 24px; border-bottom: 1px solid #f1f5f9; }
+    .skeleton-box { height: 16px; background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
   </style>
 </head>
-<body data-page="support">
+<body data-page="support" class="bg-[#fafafa] text-slate-900">
   <div class="app-shell">
     <div id="sidebar-host"></div>
     <div class="mobile-overlay" data-close-sidebar></div>
     
-    <div class="main-area">
-      <header class="topbar">
-        <div class="topbar-left">
-          <button class="icon-button menu-button" type="button" data-open-sidebar aria-label="Open navigation"><i data-lucide="menu"></i></button>
-          <span class="topbar-title">Customer Support</span>
+    <div class="main-area min-h-screen">
+      <header class="topbar bg-white border-b border-slate-200/60 sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button class="lg:hidden text-slate-500 hover:text-slate-800" data-open-sidebar><i data-lucide="menu" class="w-5 h-5"></i></button>
+          <h1 class="text-lg font-semibold text-slate-800 tracking-tight">Customer Support</h1>
         </div>
-        <div class="topbar-actions">
-          <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
-          <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
-          <button class="profile-button" type="button" onclick="logoutAdmin()"><span class="avatar">AD</span><span class="profile-copy"><strong>Admin Console</strong><small>Click to logout</small></span><i data-lucide="log-out" style="width:14px;height:14px;color:#8b95a7"></i></button>
+        <div class="flex items-center gap-4">
+          <button class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-500 hover:bg-slate-100 transition"><i data-lucide="bell" class="w-4 h-4"></i></button>
+          <div class="h-5 w-px bg-slate-200"></div>
+          <button onclick="logoutAdmin()" class="flex items-center gap-2 group">
+            <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold border border-blue-100">AD</div>
+            <span class="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition hidden sm:block">Logout</span>
+            <i data-lucide="log-out" class="w-4 h-4 text-slate-400 group-hover:text-red-500 transition"></i>
+          </button>
         </div>
       </header>
       
-      <main class="page-content">
-        <div class="page-heading">
-          <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>Customer Support</h1><p>Review tickets and coordinate customer resolutions.</p></div>
-          <div class="heading-actions">
-            <button class="button" type="button" onclick="loadData()"><i data-lucide="refresh-cw"></i> Refresh</button>
+      <main class="p-6 max-w-[1400px] mx-auto space-y-6">
+        
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">NUMBAHUB / ADMINISTRATION</p>
+            <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Helpdesk</h2>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="loadData()" class="text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition flex items-center gap-2">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i> Refresh Inbox
+            </button>
           </div>
         </div>
 
-        <div class="stats-grid">
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Open tickets</span><span class="stat-icon"><i data-lucide="inbox"></i></span></div>
-            <div class="stat-value" id="statOpen">...</div>
-            <div class="stat-foot">Needs attention</div>
-          </article>
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Urgent</span><span class="stat-icon"><i data-lucide="alert-triangle"></i></span></div>
-            <div class="stat-value" id="statUrgent">...</div>
-            <div class="stat-foot"><span class="trend-down">Review promptly</span></div>
-          </article>
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Awaiting customer</span><span class="stat-icon"><i data-lucide="message-circle"></i></span></div>
-            <div class="stat-value" id="statPending">...</div>
-            <div class="stat-foot">Pending reply</div>
-          </article>
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Resolved today</span><span class="stat-icon"><i data-lucide="check-check"></i></span></div>
-            <div class="stat-value" id="statResolved">...</div>
-            <div class="stat-foot">Great job!</div>
-          </article>
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Open Tickets</span>
+              <i data-lucide="inbox" class="w-4 h-4 text-blue-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="statOpen">...</div>
+            <div class="text-xs text-slate-400 font-medium mt-1">Needs attention</div>
+          </div>
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Urgent</span>
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-red-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="statUrgent">...</div>
+            <div class="text-xs text-red-500 font-medium mt-1">Review promptly</div>
+          </div>
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Awaiting Customer</span>
+              <i data-lucide="message-circle" class="w-4 h-4 text-orange-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="statPending">...</div>
+            <div class="text-xs text-slate-400 font-medium mt-1">Pending reply</div>
+          </div>
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Resolved Today</span>
+              <i data-lucide="check-check" class="w-4 h-4 text-emerald-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="statResolved">...</div>
+            <div class="text-xs text-emerald-600 font-medium mt-1">Great job!</div>
+          </div>
         </div>
 
-        <div class="table-panel">
-          <div class="table-toolbar">
-            <div><h2>Support tickets</h2><p class="panel-subtitle">Live customer inquiries.</p></div>
-            <div class="toolbar-controls">
-              <div class="table-search">
-                <i data-lucide="search"></i>
-                <input class="input-control" id="ticketSearch" placeholder="Search tickets..." onkeyup="handleSearch()">
+        <!-- Data Table -->
+        <div class="smart-card overflow-hidden">
+          <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Support Tickets</h3>
+              <p class="text-xs text-slate-500 mt-1">Live customer inquiries and issues.</p>
+            </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+              <div class="relative w-full sm:w-64">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                <input class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:bg-white transition" id="ticketSearch" placeholder="Search tickets..." onkeyup="handleSearch()">
               </div>
-              <select class="select-control" id="priorityFilter" style="width:140px" onchange="loadTickets()">
-                <option value="">All priorities</option>
+              <select class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 outline-none cursor-pointer" id="priorityFilter" onchange="loadTickets()">
+                <option value="">All Priorities</option>
                 <option value="Urgent">Urgent</option>
                 <option value="High">High</option>
                 <option value="Normal">Normal</option>
@@ -91,65 +153,85 @@
             </div>
           </div>
           
-          <div class="table-wrap">
-            <table id="support-table">
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
               <thead>
-                <tr><th>Ticket</th><th>Customer</th><th>Subject</th><th>Priority</th><th>Assigned to</th><th>Status</th><th>Updated</th><th>Action</th></tr>
+                <tr class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold border-b border-slate-100 bg-slate-50/50">
+                  <th class="px-6 py-4">Ticket ID</th>
+                  <th class="px-6 py-4">Customer</th>
+                  <th class="px-6 py-4">Subject</th>
+                  <th class="px-6 py-4">Priority</th>
+                  <th class="px-6 py-4">Assigned To</th>
+                  <th class="px-6 py-4">Status</th>
+                  <th class="px-6 py-4 text-right">Action</th>
+                </tr>
               </thead>
-              <tbody id="ticketTableBody">
-                <tr><td colspan="8" style="text-align: center;">Loading tickets...</td></tr>
+              <tbody id="ticketTableBody" class="text-sm text-slate-700 divide-y divide-slate-100">
+                <!-- Skeleton Loader -->
+                <tr class="skeleton-row"><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-3/4"></div></td><td><div class="skeleton-box w-full"></div></td><td><div class="skeleton-box w-1/3"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/3"></div></td><td><div class="skeleton-box w-1/4 ml-auto"></div></td></tr>
+                <tr class="skeleton-row"><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-3/4"></div></td><td><div class="skeleton-box w-full"></div></td><td><div class="skeleton-box w-1/3"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/3"></div></td><td><div class="skeleton-box w-1/4 ml-auto"></div></td></tr>
+                <tr class="skeleton-row"><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-3/4"></div></td><td><div class="skeleton-box w-full"></div></td><td><div class="skeleton-box w-1/3"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/3"></div></td><td><div class="skeleton-box w-1/4 ml-auto"></div></td></tr>
               </tbody>
             </table>
           </div>
           
-          <div class="table-footer">
-            <span id="tableInfo">Showing 0 tickets</span>
-            <div class="pagination" id="paginationControls"></div>
+          <div class="p-4 border-t border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <span id="tableInfo" class="text-xs font-medium text-slate-500">Showing 0 tickets</span>
+            <div class="pagination flex gap-1" id="paginationControls"></div>
           </div>
         </div>
       </main>
     </div>
   </div>
 
-  <!-- 🟢 CHAT MODAL -->
+  <!-- 🟢 PREMIUM CHAT MODAL -->
   <div class="modal-overlay" id="ticketModal">
     <div class="premium-modal">
-      <div class="modal-header">
-        <div>
-          <h2 style="margin: 0; font-size: 18px; font-weight: 700;" id="modalSubject">Ticket Subject</h2>
-          <div style="font-size: 13px; color: #64748b; margin-top: 4px;" id="modalCustomer">Customer Name</div>
+      
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg shadow-sm" id="modalAvatar">C</div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900 leading-tight" id="modalSubject">Ticket Subject</h2>
+            <div class="text-xs text-slate-500 font-medium mt-0.5" id="modalCustomer">Customer Name</div>
+          </div>
         </div>
-        <button class="icon-button" onclick="closeModal()"><i data-lucide="x"></i></button>
+        <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition" onclick="closeModal()"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       
-      <!-- Controls -->
-      <div style="padding: 16px 24px; border-bottom: 1px solid #e2e8f0; display: flex; gap: 16px; background: #fff;">
-        <div style="flex: 1;">
-          <label style="font-size: 12px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">Status</label>
-          <select id="modalStatus" class="input-control" style="padding: 8px; height: 38px;" onchange="updateTicketMeta()">
-            <option value="Open">Open</option>
-            <option value="Pending">Pending</option>
-            <option value="Resolved">Resolved</option>
+      <!-- Controls Bar -->
+      <div class="px-6 py-3 border-b border-slate-100 flex flex-wrap gap-4 bg-slate-50/50">
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-bold text-slate-500">Status:</label>
+          <select id="modalStatus" class="px-2 py-1.5 bg-white border border-slate-200 rounded-md text-xs font-bold text-slate-700 outline-none cursor-pointer focus:border-blue-500" onchange="updateTicketMeta()">
+            <option value="Open">🔵 Open</option>
+            <option value="Pending">🟠 Pending</option>
+            <option value="Resolved">🟢 Resolved</option>
           </select>
         </div>
-        <div style="flex: 1;">
-          <label style="font-size: 12px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">Priority</label>
-          <select id="modalPriority" class="input-control" style="padding: 8px; height: 38px;" onchange="updateTicketMeta()">
-            <option value="Normal">Normal</option>
-            <option value="High">High</option>
-            <option value="Urgent">Urgent</option>
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-bold text-slate-500">Priority:</label>
+          <select id="modalPriority" class="px-2 py-1.5 bg-white border border-slate-200 rounded-md text-xs font-bold text-slate-700 outline-none cursor-pointer focus:border-blue-500" onchange="updateTicketMeta()">
+            <option value="Normal">⚪ Normal</option>
+            <option value="High">🟡 High</option>
+            <option value="Urgent">🔴 Urgent</option>
           </select>
         </div>
       </div>
 
-      <div class="modal-body" id="chatContainer" style="display: flex; flex-direction: column;">
-        <!-- Chat messages injected here -->
+      <!-- Chat Area -->
+      <div class="chat-container" id="chatContainer">
+        <p style="text-align: center; color: #64748b; font-size: 14px; margin-top: 20px;">Loading conversation...</p>
       </div>
       
-      <div class="modal-footer">
-        <div style="display: flex; gap: 10px;">
-          <input type="text" id="replyInput" class="input-control" placeholder="Type your reply here..." style="flex: 1;" onkeypress="handleReplyEnter(event)">
-          <button class="button button-primary" id="sendReplyBtn" onclick="sendReply()">Send Reply</button>
+      <!-- Reply Footer -->
+      <div class="px-6 py-4 border-t border-slate-100 bg-white">
+        <div class="flex gap-3 items-end">
+          <textarea id="replyInput" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-blue-500 focus:bg-white transition resize-none" rows="1" placeholder="Type your reply..." onkeypress="handleReplyEnter(event)"></textarea>
+          <button class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-md shadow-blue-500/30 transition flex items-center gap-2 flex-shrink-0" id="sendReplyBtn" onclick="sendReply()">
+            <span class="hidden sm:inline">Send</span> <i data-lucide="send" class="w-4 h-4"></i>
+          </button>
         </div>
       </div>
     </div>
@@ -196,7 +278,7 @@
 
         const currentPage = document.body.dataset.page || 'dashboard';
         const activeLink = host.querySelector(`a[data-nav="${currentPage}"]`);
-        if (activeLink) { activeLink.style.background = 'var(--brand)'; activeLink.style.color = '#fff'; }
+        if (activeLink) activeLink.classList.add('active');
         if (window.lucide) lucide.createIcons();
         
         const sidebarLogoutBtn = host.querySelector('[data-action="logout"]');
@@ -232,13 +314,11 @@
       const priority = document.getElementById("priorityFilter").value;
       const url = `/admin/support/tickets?page=${currentPage}&limit=10&search=${searchQuery}&priority=${priority}`;
 
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align: center;">Loading...</td></tr>`;
-
       try {
         const data = await adminFetch(url);
         
         if (data.tickets.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="8" style="text-align: center;">No tickets found.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-slate-400">No tickets found.</td></tr>`;
           document.getElementById("tableInfo").textContent = `Showing 0 tickets`;
           document.getElementById("paginationControls").innerHTML = "";
           return;
@@ -249,19 +329,29 @@
           const assignee = t.assignedTo ? `${t.assignedTo.firstName}` : 'Unassigned';
           const date = new Date(t.updatedAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
           
-          let priorityClass = t.priority === "Urgent" ? "failed" : t.priority === "High" ? "pending" : "neutral";
-          let statusClass = t.status === "Open" ? "pending" : t.status === "Resolved" ? "" : "info";
+          // Priority Badges
+          let priorityClass = "bg-slate-100 text-slate-600 border-slate-200"; // Normal
+          if (t.priority === "Urgent") priorityClass = "bg-red-50 text-red-700 border-red-200";
+          if (t.priority === "High") priorityClass = "bg-orange-50 text-orange-700 border-orange-200";
+
+          // Status Badges
+          let statusClass = "bg-blue-50 text-blue-700 border-blue-200"; // Open
+          if (t.status === "Pending") statusClass = "bg-orange-50 text-orange-700 border-orange-200";
+          if (t.status === "Resolved") statusClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
 
           return `
-            <tr>
-              <td class="cell-primary">${t.ticketId}</td>
-              <td>${customer}</td>
-              <td>${t.subject}</td>
-              <td><span class="status ${priorityClass}">${t.priority}</span></td>
-              <td>${assignee}</td>
-              <td><span class="status ${statusClass}">${t.status}</span></td>
-              <td>${date}</td>
-              <td><button class="button button-small" onclick="openTicket('${t._id}')">Open</button></td>
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900 text-sm">${t.ticketId}</td>
+              <td class="px-6 py-4 text-sm">${customer}</td>
+              <td class="px-6 py-4 text-sm font-semibold text-slate-800">${t.subject}</td>
+              <td class="px-6 py-4"><span class="px-2 py-1 border rounded-md text-[10px] font-bold ${priorityClass}">${t.priority}</span></td>
+              <td class="px-6 py-4 text-xs text-slate-500 font-medium">${assignee}</td>
+              <td class="px-6 py-4"><span class="px-2.5 py-1 border rounded-full text-xs font-bold ${statusClass}">${t.status}</span></td>
+              <td class="px-6 py-4 text-right">
+                <button class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg shadow-sm hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition" onclick="openTicket('${t._id}')">
+                  Open Chat
+                </button>
+              </td>
             </tr>
           `;
         }).join('');
@@ -271,7 +361,7 @@
 
       } catch (err) {
         console.error("Tickets error:", err);
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: red;">Failed to load tickets.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-red-500">Failed to load tickets.</td></tr>`;
       }
     }
 
@@ -279,15 +369,15 @@
       const container = document.getElementById("paginationControls");
       let html = "";
       if (totalPages > 1) {
-        html += `<button ${current === 1 ? 'disabled' : ''} onclick="changePage(${current - 1})"><i data-lucide="chevron-left"></i></button>`;
+        html += `<button ${current === 1 ? 'disabled' : ''} class="p-1.5 rounded-md border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50" onclick="changePage(${current - 1})"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>`;
         for (let i = 1; i <= totalPages; i++) {
           if (i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {
-            html += `<button class="${i === current ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            html += `<button class="w-8 h-8 rounded-md border ${i === current ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'border-slate-200 text-slate-600 hover:bg-slate-50'} text-xs font-semibold transition" onclick="changePage(${i})">${i}</button>`;
           } else if (i === current - 2 || i === current + 2) {
-            html += `<span>...</span>`;
+            html += `<span class="text-slate-400 px-1">...</span>`;
           }
         }
-        html += `<button ${current === totalPages ? 'disabled' : ''} onclick="changePage(${current + 1})"><i data-lucide="chevron-right"></i></button>`;
+        html += `<button ${current === totalPages ? 'disabled' : ''} class="p-1.5 rounded-md border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50" onclick="changePage(${current + 1})"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>`;
       }
       container.innerHTML = html;
       if (window.lucide) lucide.createIcons();
@@ -305,10 +395,7 @@
       }, 500);
     }
 
-    function loadData() {
-      loadStats();
-      loadTickets();
-    }
+    function loadData() { loadStats(); loadTickets(); }
 
     // 🟢 TICKET MODAL & CHAT LOGIC
     window.openTicket = async (id) => {
@@ -317,20 +404,22 @@
       const chatContainer = document.getElementById("chatContainer");
       
       modal.classList.add("active");
-      chatContainer.innerHTML = `<p style="text-align: center; color: #64748b;">Loading conversation...</p>`;
+      chatContainer.innerHTML = `<p style="text-align: center; color: #64748b; margin-top: 20px;">Loading conversation...</p>`;
 
       try {
         const ticket = await adminFetch(`/admin/support/tickets/${id}`);
         
+        const initials = `${ticket.user?.firstName?.[0] || ""}${ticket.user?.lastName?.[0] || ""}`.toUpperCase();
+        document.getElementById("modalAvatar").textContent = initials;
         document.getElementById("modalSubject").textContent = ticket.subject;
-        document.getElementById("modalCustomer").textContent = `${ticket.user.firstName} ${ticket.user.lastName} (${ticket.user.email})`;
+        document.getElementById("modalCustomer").textContent = `${ticket.user?.firstName} ${ticket.user?.lastName} (${ticket.user?.email})`;
         document.getElementById("modalStatus").value = ticket.status;
         document.getElementById("modalPriority").value = ticket.priority;
 
         let chatHtml = `
           <!-- Original Message -->
           <div class="chat-bubble chat-user">
-            <span class="chat-meta">${ticket.user.firstName} • ${new Date(ticket.createdAt).toLocaleString()}</span>
+            <span class="chat-meta text-slate-400">${ticket.user?.firstName} • ${new Date(ticket.createdAt).toLocaleString()}</span>
             ${ticket.message}
           </div>
         `;
@@ -340,18 +429,22 @@
           const isAdmin = reply.senderName.includes("Support");
           chatHtml += `
             <div class="chat-bubble ${isAdmin ? 'chat-admin' : 'chat-user'}">
-              <span class="chat-meta" style="${isAdmin ? 'color: rgba(255,255,255,0.8);' : ''}">${reply.senderName} • ${new Date(reply.createdAt).toLocaleString()}</span>
+              <span class="chat-meta ${isAdmin ? 'text-blue-200' : 'text-slate-400'}">${reply.senderName} • ${new Date(reply.createdAt).toLocaleString()}</span>
               ${reply.message}
             </div>
           `;
         });
 
         chatContainer.innerHTML = chatHtml;
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-        document.getElementById("replyInput").focus();
+        
+        // Scroll to bottom
+        setTimeout(() => {
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+          document.getElementById("replyInput").focus();
+        }, 100);
 
       } catch (err) {
-        chatContainer.innerHTML = `<p style="text-align: center; color: red;">Failed to load conversation.</p>`;
+        chatContainer.innerHTML = `<p style="text-align: center; color: red; margin-top: 20px;">Failed to load conversation.</p>`;
       }
     };
 
@@ -377,7 +470,10 @@
     };
 
     window.handleReplyEnter = (e) => {
-      if (e.key === "Enter") sendReply();
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendReply();
+      }
     };
 
     window.sendReply = async () => {
@@ -387,8 +483,10 @@
       if (!message) return;
 
       const btn = document.getElementById("sendReplyBtn");
+      const originalText = btn.innerHTML;
       btn.disabled = true;
-      btn.textContent = "Sending...";
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i>`;
+      if (window.lucide) lucide.createIcons();
       input.disabled = true;
 
       try {
@@ -401,13 +499,14 @@
         const chatContainer = document.getElementById("chatContainer");
         chatContainer.innerHTML += `
           <div class="chat-bubble chat-admin">
-            <span class="chat-meta" style="color: rgba(255,255,255,0.8);">You • Just now</span>
+            <span class="chat-meta text-blue-200">You • Just now</span>
             ${message}
           </div>
         `;
         chatContainer.scrollTop = chatContainer.scrollHeight;
         
         input.value = "";
+        input.style.height = "auto"; // reset textarea height
         
         // Update Status dropdown if it changed from Open -> Pending
         if (res.ticket.status === "Pending" && document.getElementById("modalStatus").value === "Open") {
@@ -418,9 +517,10 @@
         alert(err.message || "Failed to send reply");
       } finally {
         btn.disabled = false;
-        btn.textContent = "Send Reply";
+        btn.innerHTML = originalText;
         input.disabled = false;
         input.focus();
+        if (window.lucide) lucide.createIcons();
       }
     };
 

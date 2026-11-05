@@ -8,113 +8,273 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="../assets/css/admin.css">
+  <style>
+    /* Premium Card Style */
+    .smart-card {
+      background: #ffffff;
+      border: 1px solid #f1f5f9;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.01);
+      transition: all 0.2s ease;
+    }
+    .smart-card:hover { border-color: #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+
+    /* Premium Modal Styles */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 16px;
+      opacity: 0; visibility: hidden; transition: all 0.2s ease;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .premium-modal {
+      background: #fff; width: 100%; max-width: 500px; border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: translateY(20px);
+      transition: transform 0.2s ease; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .modal-overlay.active .premium-modal { transform: translateY(0); }
+    
+    /* Skeleton Loading */
+    .skeleton-row td { padding: 20px 24px; border-bottom: 1px solid #f1f5f9; }
+    .skeleton-box { height: 16px; background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* Custom Checkbox */
+    .custom-checkbox {
+      appearance: none; width: 20px; height: 20px; border: 2px solid #cbd5e1; border-radius: 6px;
+      cursor: pointer; position: relative; transition: all 0.2s; flex-shrink: 0;
+    }
+    .custom-checkbox:checked { background-color: #3179df; border-color: #3179df; }
+    .custom-checkbox:checked::after {
+      content: ''; position: absolute; left: 5px; top: 1px; width: 5px; height: 10px;
+      border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg);
+    }
+  </style>
 </head>
-<body data-page="finance">
+<body data-page="finance" class="bg-[#fafafa] text-slate-900">
   <div class="app-shell">
     <div id="sidebar-host"></div>
     <div class="mobile-overlay" data-close-sidebar></div>
     
-    <div class="main-area">
-      <header class="topbar">
-        <div class="topbar-left">
-          <button class="icon-button menu-button" type="button" data-open-sidebar aria-label="Open navigation"><i data-lucide="menu"></i></button>
-          <span class="topbar-title">Finance</span>
+    <div class="main-area min-h-screen">
+      <header class="topbar bg-white border-b border-slate-200/60 sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button class="lg:hidden text-slate-500 hover:text-slate-800" data-open-sidebar><i data-lucide="menu" class="w-5 h-5"></i></button>
+          <h1 class="text-lg font-semibold text-slate-800 tracking-tight">Finance & Ledger</h1>
         </div>
-        <div class="topbar-actions">
-          <label class="topbar-search"><i data-lucide="search"></i><input type="search" placeholder="Search this page..." aria-label="Search this page" data-global-search></label>
-          <button class="icon-button" type="button" data-action="notifications" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
-          <button class="profile-button" type="button" onclick="logoutAdmin()"><span class="avatar">AD</span><span class="profile-copy"><strong>Admin Console</strong><small>Click to logout</small></span><i data-lucide="log-out" style="width:14px;height:14px;color:#8b95a7"></i></button>
+        <div class="flex items-center gap-4">
+          <button class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-500 hover:bg-slate-100 transition"><i data-lucide="bell" class="w-4 h-4"></i></button>
+          <div class="h-5 w-px bg-slate-200"></div>
+          <button onclick="logoutAdmin()" class="flex items-center gap-2 group">
+            <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold border border-blue-100">AD</div>
+            <span class="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition hidden sm:block">Logout</span>
+            <i data-lucide="log-out" class="w-4 h-4 text-slate-400 group-hover:text-red-500 transition"></i>
+          </button>
         </div>
       </header>
       
-      <main class="page-content">
-        <div class="page-heading">
-          <div><p class="eyebrow">NUMBAHUB / ADMINISTRATION</p><h1>Finance</h1><p>Review wallets, deposits, refunds and reconciliation.</p></div>
-          <div class="heading-actions">
-            <button class="button" type="button" onclick="loadData()"><i data-lucide="refresh-cw"></i> Refresh</button>
-          </div>
-        </div>
+      <main class="p-6 max-w-[1400px] mx-auto space-y-6">
         
-        <div class="alert-box" style="margin-bottom: 24px; display: flex; gap: 12px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
-          <i data-lucide="info" style="color: #64748b;"></i>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <strong style="display: block; font-size: 14px; color: #1e293b;">Live financial data</strong>
-            <span style="font-size: 13px; color: #64748b;">This ledger shows real transactions processed on the platform.</span>
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">NUMBAHUB / ADMINISTRATION</p>
+            <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Finance Overview</h2>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="exportToCSV()" class="text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2">
+              <i data-lucide="download" class="w-4 h-4"></i> Export Ledger
+            </button>
+            <button onclick="loadData()" class="text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition flex items-center gap-2">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i> Refresh
+            </button>
           </div>
         </div>
 
-        <div class="stats-grid">
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Deposits today</span><span class="stat-icon"><i data-lucide="arrow-down-left"></i></span></div>
-            <div class="stat-value" id="statDepositsToday">...</div>
-            <div class="stat-foot">Live volume</div>
-          </article>
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Pending requests</span><span class="stat-icon"><i data-lucide="rotate-ccw"></i></span></div>
-            <div class="stat-value" id="statRefunds">...</div>
-            <div class="stat-foot"><span class="trend-down">Needs review</span></div>
-          </article>
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Wallet liabilities</span><span class="stat-icon"><i data-lucide="wallet"></i></span></div>
-            <div class="stat-value" id="statLiabilities">...</div>
-            <div class="stat-foot">Live ledger total</div>
-          </article>
-          <article class="stat-card">
-            <div class="stat-top"><span class="stat-label">Reconciliation</span><span class="stat-icon"><i data-lucide="scale"></i></span></div>
-            <div class="stat-value" id="statReconciliation">...</div>
-            <div class="stat-foot">Pending exceptions</div>
-          </article>
+        <!-- Live Financial Data Alert -->
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3 text-blue-800 items-start">
+          <i data-lucide="shield-check" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+          <div>
+            <strong class="block text-sm font-bold">Live Ledger Immutability</strong>
+            <span class="text-xs text-blue-700 mt-1 block leading-relaxed">This ledger shows real transactions processed on the platform. Always reconcile with payment gateway settlements.</span>
+          </div>
         </div>
 
-        <div class="table-panel">
-          <div class="table-toolbar">
-            <div><h2>Financial ledger</h2><p class="panel-subtitle">Immutable ledger entries.</p></div>
-            <div class="toolbar-controls">
-              <div class="table-search">
-                <i data-lucide="search"></i>
-                <input class="input-control" id="ledgerSearch" placeholder="Search reference..." onkeyup="handleSearch()">
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Deposits Today</span>
+              <i data-lucide="arrow-down-left" class="w-4 h-4 text-emerald-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="statDepositsToday">...</div>
+            <div class="text-xs text-slate-400 font-medium mt-1">Live volume</div>
+          </div>
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Pending Requests</span>
+              <i data-lucide="rotate-ccw" class="w-4 h-4 text-orange-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="statRefunds">...</div>
+            <div class="text-xs text-orange-500 font-medium mt-1">Needs review</div>
+          </div>
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Wallet Liabilities</span>
+              <i data-lucide="wallet" class="w-4 h-4 text-purple-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="statLiabilities">...</div>
+            <div class="text-xs text-slate-400 font-medium mt-1">Live ledger total</div>
+          </div>
+          <div class="smart-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-medium text-slate-500">Reconciliation</span>
+              <i data-lucide="scale" class="w-4 h-4 text-blue-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-slate-900" id="statReconciliation">...</div>
+            <div class="text-xs text-slate-400 font-medium mt-1">Pending exceptions</div>
+          </div>
+        </div>
+
+        <!-- Ledger Table -->
+        <div class="smart-card overflow-hidden">
+          <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Financial Ledger</h3>
+              <p class="text-xs text-slate-500 mt-1">Immutable ledger entries of all transactions.</p>
+            </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+              <div class="relative w-full sm:w-64">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                <input class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:bg-white transition" id="ledgerSearch" placeholder="Search reference..." onkeyup="handleSearch()">
               </div>
-              <select class="select-control" id="typeFilter" style="width:140px" onchange="loadLedger()">
-                <option value="">All types</option>
+              <select class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 outline-none cursor-pointer" id="typeFilter" onchange="loadLedger()">
+                <option value="">All Types</option>
                 <option value="Deposit">Deposit</option>
                 <option value="Adjustment">Adjustment</option>
               </select>
             </div>
           </div>
           
-          <div class="table-wrap">
-            <table id="finance-table">
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
               <thead>
-                <tr><th>Reference</th><th>Customer</th><th>Type</th><th>Amount</th><th>Channel</th><th>Status</th><th>Action</th></tr>
+                <tr class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold border-b border-slate-100 bg-slate-50/50">
+                  <th class="px-6 py-4">Reference</th>
+                  <th class="px-6 py-4">Customer</th>
+                  <th class="px-6 py-4">Type</th>
+                  <th class="px-6 py-4">Amount</th>
+                  <th class="px-6 py-4">Channel</th>
+                  <th class="px-6 py-4">Status</th>
+                  <th class="px-6 py-4 text-right">Action</th>
+                </tr>
               </thead>
-              <tbody id="ledgerTableBody">
-                <tr><td colspan="7" style="text-align: center;">Loading ledger...</td></tr>
+              <tbody id="ledgerTableBody" class="text-sm text-slate-700 divide-y divide-slate-100">
+                <!-- Skeleton Loader -->
+                <tr class="skeleton-row"><td><div class="skeleton-box w-3/4"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/3"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/3"></div></td><td><div class="skeleton-box w-1/4 ml-auto"></div></td></tr>
+                <tr class="skeleton-row"><td><div class="skeleton-box w-2/3"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/3"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/3"></div></td><td><div class="skeleton-box w-1/4 ml-auto"></div></td></tr>
+                <tr class="skeleton-row"><td><div class="skeleton-box w-3/4"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/3"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/2"></div></td><td><div class="skeleton-box w-1/3"></div></td><td><div class="skeleton-box w-1/4 ml-auto"></div></td></tr>
               </tbody>
             </table>
           </div>
           
-          <div class="table-footer">
-            <span id="tableInfo">Showing 0 records</span>
-            <div class="pagination" id="paginationControls"></div>
+          <div class="p-4 border-t border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <span id="tableInfo" class="text-xs font-medium text-slate-500">Showing 0 records</span>
+            <div class="pagination flex gap-1" id="paginationControls"></div>
           </div>
         </div>
 
-        <div class="content-grid">
-          <section class="panel">
-            <div class="panel-header"><div><h2 class="panel-title">Reconciliation checklist</h2><p class="panel-subtitle">Daily close controls</p></div></div>
-            <div class="activity-list">
-              <label class="check-row"><input type="checkbox"> Compare payment gateway settlements with recorded deposits.</label>
-              <label class="check-row"><input type="checkbox"> Confirm refund references and provider status.</label>
-              <label class="check-row"><input type="checkbox"> Investigate unmatched or duplicate references.</label>
-              <label class="check-row"><input type="checkbox"> Record reviewer and close-of-day timestamp.</label>
+        <!-- Bottom Sections: Checklist & Policy -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Reconciliation Checklist -->
+          <div class="smart-card p-6">
+            <h3 class="text-base font-bold text-slate-900 mb-1">Reconciliation Checklist</h3>
+            <p class="text-xs text-slate-500 mb-4">Daily close controls</p>
+            <div class="space-y-4">
+              <label class="flex items-start gap-3 cursor-pointer group">
+                <input type="checkbox" class="custom-checkbox mt-0.5">
+                <span class="text-sm text-slate-600 group-hover:text-slate-900 transition">Compare payment gateway settlements with recorded deposits.</span>
+              </label>
+              <label class="flex items-start gap-3 cursor-pointer group">
+                <input type="checkbox" class="custom-checkbox mt-0.5">
+                <span class="text-sm text-slate-600 group-hover:text-slate-900 transition">Confirm refund references and provider status.</span>
+              </label>
+              <label class="flex items-start gap-3 cursor-pointer group">
+                <input type="checkbox" class="custom-checkbox mt-0.5">
+                <span class="text-sm text-slate-600 group-hover:text-slate-900 transition">Investigate unmatched or duplicate references.</span>
+              </label>
+              <label class="flex items-start gap-3 cursor-pointer group">
+                <input type="checkbox" class="custom-checkbox mt-0.5">
+                <span class="text-sm text-slate-600 group-hover:text-slate-900 transition">Record reviewer and close-of-day timestamp.</span>
+              </label>
             </div>
-          </section>
-          <section class="panel">
-            <div class="panel-header"><div><h2 class="panel-title">Financial control policy</h2><p class="panel-subtitle">Security guidelines</p></div></div>
-            <p class="panel-subtitle" style="line-height:1.8">Use an append-only ledger, idempotency keys, server-side authorization, explicit approval thresholds, and auditable reversals. Never use a browser-only balance edit as a real financial operation.</p>
-          </section>
+          </div>
+
+          <!-- Financial Control Policy -->
+          <div class="smart-card p-6 bg-slate-900 text-white border-slate-800">
+            <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mb-4 text-blue-400">
+              <i data-lucide="shield-alert" class="w-5 h-5"></i>
+            </div>
+            <h3 class="text-base font-bold mb-2">Financial Control Policy</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">
+              Use an append-only ledger, idempotency keys, server-side authorization, explicit approval thresholds, and auditable reversals. Never use a browser-only balance edit as a real financial operation. All adjustments are logged automatically.
+            </p>
+          </div>
         </div>
       </main>
+    </div>
+  </div>
+
+  <!-- 🟢 TRANSACTION DETAILS MODAL -->
+  <div class="modal-overlay" id="txModal">
+    <div class="premium-modal">
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
+        <h2 class="text-lg font-bold text-slate-900">Transaction Details</h2>
+        <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition" onclick="closeModal()"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      
+      <div class="p-6 bg-slate-50/50 space-y-4">
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-3">
+          
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+            <span class="text-xs font-medium text-slate-500">Reference</span>
+            <span class="text-xs font-mono font-bold text-slate-800" id="modalRef">-</span>
+          </div>
+
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+            <span class="text-xs font-medium text-slate-500">Customer</span>
+            <span class="text-xs font-semibold text-slate-800" id="modalCustomer">-</span>
+          </div>
+          
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+            <span class="text-xs font-medium text-slate-500">Service</span>
+            <span class="text-xs font-semibold text-slate-800 capitalize" id="modalService">-</span>
+          </div>
+          
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+            <span class="text-xs font-medium text-slate-500">Provider</span>
+            <span class="text-xs font-semibold text-slate-800" id="modalProvider">-</span>
+          </div>
+
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+            <span class="text-xs font-medium text-slate-500">Date</span>
+            <span class="text-xs font-semibold text-slate-800" id="modalDate">-</span>
+          </div>
+
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-medium text-slate-500">Status</span>
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold" id="modalStatus">-</span>
+          </div>
+        </div>
+
+        <!-- Amount Card -->
+        <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-6 rounded-xl shadow-lg text-white text-center">
+          <div class="text-blue-200 text-xs font-medium mb-1">Amount Processed</div>
+          <div class="text-4xl font-extrabold tracking-tight" id="modalAmount">₦0.00</div>
+        </div>
+      </div>
+
+      <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-3 bg-white">
+        <button class="px-5 py-2.5 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition" onclick="closeModal()">Close</button>
+      </div>
     </div>
   </div>
   
@@ -125,13 +285,19 @@
 
     let currentPage = 1;
     let searchQuery = "";
+    let currentTransactionsList = []; // For CSV export
 
-    async function adminFetch(endpoint) {
+    async function adminFetch(endpoint, options = {}) {
       const token = localStorage.getItem("adminToken");
       if (!token) { window.location.href = "login.html"; return; }
-      const res = await fetch(`${API_URL}${endpoint}`, { headers: { "Authorization": `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}${endpoint}`, { 
+        ...options,
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", ...options.headers } 
+      });
       if (res.status === 401 || res.status === 403) { localStorage.removeItem("adminToken"); window.location.href = "login.html"; return; }
-      return await res.json();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Request failed");
+      return data;
     }
 
     async function loadSidebar() {
@@ -145,9 +311,15 @@
         html = html.replace(/__ROOT__/g, rootPath);
         host.innerHTML = html;
         
+        const adminUser = JSON.parse(localStorage.getItem("adminUser") || "{}");
+        if (adminUser.firstName) {
+          document.getElementById("sidebarAdminName").textContent = `${adminUser.firstName} ${adminUser.lastName || ''}`.trim();
+          document.getElementById("sidebarAdminEmail").textContent = adminUser.email;
+        }
+
         const currentPage = document.body.dataset.page || 'dashboard';
         const activeLink = host.querySelector(`a[data-nav="${currentPage}"]`);
-        if (activeLink) { activeLink.style.background = 'var(--brand)'; activeLink.style.color = '#fff'; }
+        if (activeLink) activeLink.classList.add('active');
         if (window.lucide) lucide.createIcons();
         
         const sidebarLogoutBtn = host.querySelector('[data-action="logout"]');
@@ -183,13 +355,12 @@
       const type = document.getElementById("typeFilter").value;
       const url = `/admin/finance/ledger?page=${currentPage}&limit=10&search=${searchQuery}&type=${type}`;
 
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Loading...</td></tr>`;
-
       try {
         const data = await adminFetch(url);
+        currentTransactionsList = data.transactions; // Save for export
         
         if (data.transactions.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No records found.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-slate-400">No records found.</td></tr>`;
           document.getElementById("tableInfo").textContent = `Showing 0 records`;
           document.getElementById("paginationControls").innerHTML = "";
           return;
@@ -201,23 +372,28 @@
           displayType = displayType.charAt(0).toUpperCase() + displayType.slice(1);
           
           // Map internal status to UI styling
-          let statusClass = "";
-          if (tx.status === "pending") statusClass = "pending";
-          if (tx.status === "successful") statusClass = ""; // default green
-          if (tx.status === "failed") statusClass = "suspended"; // red
+          let statusClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+          if (tx.status === "pending") statusClass = "bg-orange-50 text-orange-700 border-orange-200";
+          if (tx.status === "failed") statusClass = "bg-red-50 text-red-700 border-red-200";
 
           // Customer name
           const customer = tx.user ? `${tx.user.firstName} ${tx.user.lastName}` : 'Unknown';
 
           return `
-            <tr>
-              <td class="cell-primary">${tx.reference}</td>
-              <td>${customer}</td>
-              <td>${displayType}</td>
-              <td>₦${tx.amount.toLocaleString()}</td>
-              <td>${tx.provider || 'System'}</td>
-              <td><span class="status ${statusClass}">${tx.status}</span></td>
-              <td><button class="button button-small" onclick="alert('Transaction detail view coming soon.')">View</button></td>
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900 text-sm">${tx.reference.substring(0, 15)}...</td>
+              <td class="px-6 py-4 text-sm">${customer}</td>
+              <td class="px-6 py-4 text-xs font-semibold text-slate-500">${displayType}</td>
+              <td class="px-6 py-4 font-semibold text-slate-800 text-sm">₦${tx.amount.toLocaleString()}</td>
+              <td class="px-6 py-4 text-xs text-slate-500">${tx.provider || 'System'}</td>
+              <td class="px-6 py-4">
+                <span class="px-2.5 py-1 border rounded-full text-xs font-bold ${statusClass} capitalize">${tx.status}</span>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <button class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg shadow-sm hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition" onclick="openTxModal('${tx._id}')">
+                  View
+                </button>
+              </td>
             </tr>
           `;
         }).join('');
@@ -227,7 +403,7 @@
 
       } catch (err) {
         console.error("Ledger error:", err);
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">Failed to load ledger.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-red-500">Failed to load ledger.</td></tr>`;
       }
     }
 
@@ -235,15 +411,15 @@
       const container = document.getElementById("paginationControls");
       let html = "";
       if (totalPages > 1) {
-        html += `<button ${current === 1 ? 'disabled' : ''} onclick="changePage(${current - 1})"><i data-lucide="chevron-left"></i></button>`;
+        html += `<button ${current === 1 ? 'disabled' : ''} class="p-1.5 rounded-md border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50" onclick="changePage(${current - 1})"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>`;
         for (let i = 1; i <= totalPages; i++) {
           if (i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {
-            html += `<button class="${i === current ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            html += `<button class="w-8 h-8 rounded-md border ${i === current ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'border-slate-200 text-slate-600 hover:bg-slate-50'} text-xs font-semibold transition" onclick="changePage(${i})">${i}</button>`;
           } else if (i === current - 2 || i === current + 2) {
-            html += `<span>...</span>`;
+            html += `<span class="text-slate-400 px-1">...</span>`;
           }
         }
-        html += `<button ${current === totalPages ? 'disabled' : ''} onclick="changePage(${current + 1})"><i data-lucide="chevron-right"></i></button>`;
+        html += `<button ${current === totalPages ? 'disabled' : ''} class="p-1.5 rounded-md border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50" onclick="changePage(${current + 1})"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>`;
       }
       container.innerHTML = html;
       if (window.lucide) lucide.createIcons();
@@ -261,10 +437,66 @@
       }, 500);
     }
 
-    function loadData() {
-      loadStats();
-      loadLedger();
-    }
+    function loadData() { loadStats(); loadLedger(); }
+
+    // 🟢 CSV EXPORT
+    window.exportToCSV = () => {
+      if (currentTransactionsList.length === 0) return alert("No data to export on this page.");
+      
+      const headers = ["Reference", "Customer", "Service", "Amount (NGN)", "Provider", "Status", "Date"];
+      const rows = currentTransactionsList.map(tx => [
+        tx.reference,
+        tx.user ? `${tx.user.firstName} ${tx.user.lastName}` : "Unknown",
+        tx.service,
+        tx.amount,
+        tx.provider || "System",
+        tx.status,
+        new Date(tx.createdAt).toISOString()
+      ]);
+
+      let csvContent = headers.join(",") + "\n";
+      rows.forEach(row => {
+        csvContent += row.map(v => `"${v}"`).join(",") + "\n";
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.setAttribute("href", URL.createObjectURL(blob));
+      link.setAttribute("download", `numbahub_ledger_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    // 🟢 TRANSACTION MODAL LOGIC
+    window.openTxModal = (txId) => {
+      const tx = currentTransactionsList.find(t => t._id === txId);
+      if (!tx) return;
+
+      const customer = tx.user ? `${tx.user.firstName} ${tx.user.lastName}` : 'Unknown';
+      const displayType = tx.service.replace('_', ' ');
+      
+      let statusColor = "bg-emerald-100 text-emerald-700";
+      if (tx.status === "pending") statusColor = "bg-orange-100 text-orange-700";
+      if (tx.status === "failed") statusColor = "bg-red-100 text-red-700";
+
+      document.getElementById("modalRef").textContent = tx.reference;
+      document.getElementById("modalCustomer").textContent = customer;
+      document.getElementById("modalService").textContent = displayType;
+      document.getElementById("modalProvider").textContent = tx.provider || "System";
+      document.getElementById("modalDate").textContent = new Date(tx.createdAt).toLocaleString();
+      document.getElementById("modalAmount").textContent = `₦${tx.amount.toLocaleString()}`;
+      
+      const statusEl = document.getElementById("modalStatus");
+      statusEl.textContent = tx.status.toUpperCase();
+      statusEl.className = `px-2.5 py-1 rounded-full text-[10px] font-bold ${statusColor}`;
+
+      document.getElementById("txModal").classList.add("active");
+    };
+
+    window.closeModal = () => {
+      document.getElementById("txModal").classList.remove("active");
+    };
 
     document.addEventListener("DOMContentLoaded", async () => {
       if (window.lucide) lucide.createIcons();
